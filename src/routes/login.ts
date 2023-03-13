@@ -13,6 +13,7 @@ router.post(
       .cookie("jwt", token, {
         httpOnly: true,
         secure: false, //--> SET TO TRUE ON PRODUCTION
+        sameSite: "strict",
       })
       .json({
         message: "You have logged in",

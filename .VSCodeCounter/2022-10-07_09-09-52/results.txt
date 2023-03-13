@@ -1,0 +1,88 @@
+Date : 2022-10-07 09:09:52
+Directory : c:\Users\Will\Documents\typescriptsource\DogApiBack
+Total : 43 files,  15027 codes, 136 comments, 236 blanks, all 15399 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| JSON               |          2 |     13,433 |          0 |          2 |     13,435 |
+| TypeScript         |         34 |      1,509 |         52 |        216 |      1,777 |
+| JSON with Comments |          2 |         47 |         84 |          9 |        140 |
+| HTML               |          3 |         30 |          0 |          6 |         36 |
+| CSS                |          1 |          7 |          0 |          2 |          9 |
+| Markdown           |          1 |          1 |          0 |          1 |          2 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                          | files      | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                             |         43 |     15,027 |        136 |        236 |     15,399 |
+| public                                                                                        |          2 |         17 |          0 |          4 |         21 |
+| public\stylesheets                                                                            |          1 |          7 |          0 |          2 |          9 |
+| src                                                                                           |         33 |      1,502 |         51 |        214 |      1,767 |
+| src\bin                                                                                       |          1 |         46 |          1 |         11 |         58 |
+| src\config                                                                                    |          2 |         39 |          6 |          7 |         52 |
+| src\middleware                                                                                |          5 |        247 |          0 |         24 |        271 |
+| src\middleware\__tests__                                                                      |          2 |        186 |          0 |         13 |        199 |
+| src\models                                                                                    |          7 |        420 |         36 |         66 |        522 |
+| src\models\__tests__                                                                          |          3 |        202 |          0 |         20 |        222 |
+| src\routes                                                                                    |         10 |        599 |          6 |         76 |        681 |
+| src\routes\__tests__                                                                          |          4 |        340 |          0 |         39 |        379 |
+| src\services                                                                                  |          2 |         43 |          2 |          7 |         52 |
+| src\services\__tests__                                                                        |          1 |          5 |          0 |          1 |          6 |
+| src\tests                                                                                     |          2 |         74 |          0 |         13 |         87 |
+| src\utils                                                                                     |          3 |         31 |          0 |          8 |         39 |
+| views                                                                                         |          2 |         20 |          0 |          4 |         24 |
++-----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                                                      | language           | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\.eslintrc.json                            | JSON with Comments |         22 |          0 |          1 |         23 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\README.md                                 | Markdown           |          1 |          0 |          1 |          2 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\jest.config.ts                            | TypeScript         |          7 |          1 |          2 |         10 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\package-lock.json                         | JSON               |     13,377 |          0 |          1 |     13,378 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\package.json                              | JSON               |         56 |          0 |          1 |         57 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\public\index.html                         | HTML               |         10 |          0 |          2 |         12 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\public\stylesheets\style.css              | CSS                |          7 |          0 |          2 |          9 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\app.ts                                | TypeScript         |          3 |          0 |          2 |          5 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\bin\www.ts                            | TypeScript         |         46 |          1 |         11 |         58 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\config\app.ts                         | TypeScript         |         24 |          5 |          3 |         32 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\config\db.ts                          | TypeScript         |         15 |          1 |          4 |         20 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\middleware\__tests__\auth.test.ts     | TypeScript         |        154 |          0 |         10 |        164 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\middleware\__tests__\passport.test.ts | TypeScript         |         32 |          0 |          3 |         35 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\middleware\auth.ts                    | TypeScript         |         28 |          0 |          4 |         32 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\middleware\passport.ts                | TypeScript         |         24 |          0 |          5 |         29 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\middleware\types.ts                   | TypeScript         |          9 |          0 |          2 |         11 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\models\__tests__\dog.test.ts          | TypeScript         |         44 |          0 |          5 |         49 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\models\__tests__\favourite.test.ts    | TypeScript         |         92 |          0 |          9 |        101 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\models\__tests__\user.test.ts         | TypeScript         |         66 |          0 |          6 |         72 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\models\dog.ts                         | TypeScript         |         63 |          0 |         13 |         76 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\models\favourite.ts                   | TypeScript         |         66 |          0 |          9 |         75 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\models\types.ts                       | TypeScript         |         38 |         22 |         15 |         75 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\models\user.ts                        | TypeScript         |         51 |         14 |          9 |         74 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\__tests__\dogs.test.ts         | TypeScript         |        124 |          0 |         13 |        137 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\__tests__\favourites.test.ts   | TypeScript         |        114 |          0 |         11 |        125 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\__tests__\login.test.ts        | TypeScript         |         54 |          0 |          7 |         61 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\__tests__\users.test.ts        | TypeScript         |         48 |          0 |          8 |         56 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\dogs.ts                        | TypeScript         |         92 |          0 |          9 |        101 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\favourites.ts                  | TypeScript         |         85 |          0 |         13 |         98 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\index.ts                       | TypeScript         |          6 |          1 |          3 |         10 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\login.ts                       | TypeScript         |         32 |          0 |          4 |         36 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\types.ts                       | TypeScript         |         15 |          5 |          5 |         25 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\users.ts                       | TypeScript         |         29 |          0 |          3 |         32 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\services\__tests__\dog-api.test.ts    | TypeScript         |          5 |          0 |          1 |          6 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\services\dog-api.ts                   | TypeScript         |         38 |          2 |          6 |         46 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\tests\db-test-helpers.ts              | TypeScript         |         17 |          0 |          4 |         21 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\tests\test-helpers.ts                 | TypeScript         |         57 |          0 |          9 |         66 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\utils\jwt-config.ts                   | TypeScript         |         11 |          0 |          3 |         14 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\utils\type-guards.ts                  | TypeScript         |          6 |          0 |          2 |          8 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\src\utils\validators.ts                   | TypeScript         |         14 |          0 |          3 |         17 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\tsconfig.json                             | JSON with Comments |         25 |         84 |          8 |        117 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\views\dogs.ejs                            | HTML               |         10 |          0 |          2 |         12 |
+| c:\Users\Will\Documents\typescriptsource\DogApiBack\views\index.ejs                           | HTML               |         10 |          0 |          2 |         12 |
+| Total                                                                                         |                    |     15,027 |        136 |        236 |     15,399 |
++-----------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+

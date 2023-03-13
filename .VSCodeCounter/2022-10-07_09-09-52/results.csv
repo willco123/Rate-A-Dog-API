@@ -1,0 +1,45 @@
+"filename", "language", "JSON with Comments", "Markdown", "TypeScript", "JSON", "HTML", "CSS", "comment", "blank", "total"
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\.eslintrc.json", "JSON with Comments", 22, 0, 0, 0, 0, 0, 0, 1, 23
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\README.md", "Markdown", 0, 1, 0, 0, 0, 0, 0, 1, 2
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\jest.config.ts", "TypeScript", 0, 0, 7, 0, 0, 0, 1, 2, 10
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\package-lock.json", "JSON", 0, 0, 0, 13377, 0, 0, 0, 1, 13378
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\package.json", "JSON", 0, 0, 0, 56, 0, 0, 0, 1, 57
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\public\index.html", "HTML", 0, 0, 0, 0, 10, 0, 0, 2, 12
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\public\stylesheets\style.css", "CSS", 0, 0, 0, 0, 0, 7, 0, 2, 9
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\app.ts", "TypeScript", 0, 0, 3, 0, 0, 0, 0, 2, 5
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\bin\www.ts", "TypeScript", 0, 0, 46, 0, 0, 0, 1, 11, 58
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\config\app.ts", "TypeScript", 0, 0, 24, 0, 0, 0, 5, 3, 32
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\config\db.ts", "TypeScript", 0, 0, 15, 0, 0, 0, 1, 4, 20
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\middleware\__tests__\auth.test.ts", "TypeScript", 0, 0, 154, 0, 0, 0, 0, 10, 164
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\middleware\__tests__\passport.test.ts", "TypeScript", 0, 0, 32, 0, 0, 0, 0, 3, 35
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\middleware\auth.ts", "TypeScript", 0, 0, 28, 0, 0, 0, 0, 4, 32
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\middleware\passport.ts", "TypeScript", 0, 0, 24, 0, 0, 0, 0, 5, 29
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\middleware\types.ts", "TypeScript", 0, 0, 9, 0, 0, 0, 0, 2, 11
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\models\__tests__\dog.test.ts", "TypeScript", 0, 0, 44, 0, 0, 0, 0, 5, 49
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\models\__tests__\favourite.test.ts", "TypeScript", 0, 0, 92, 0, 0, 0, 0, 9, 101
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\models\__tests__\user.test.ts", "TypeScript", 0, 0, 66, 0, 0, 0, 0, 6, 72
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\models\dog.ts", "TypeScript", 0, 0, 63, 0, 0, 0, 0, 13, 76
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\models\favourite.ts", "TypeScript", 0, 0, 66, 0, 0, 0, 0, 9, 75
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\models\types.ts", "TypeScript", 0, 0, 38, 0, 0, 0, 22, 15, 75
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\models\user.ts", "TypeScript", 0, 0, 51, 0, 0, 0, 14, 9, 74
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\__tests__\dogs.test.ts", "TypeScript", 0, 0, 124, 0, 0, 0, 0, 13, 137
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\__tests__\favourites.test.ts", "TypeScript", 0, 0, 114, 0, 0, 0, 0, 11, 125
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\__tests__\login.test.ts", "TypeScript", 0, 0, 54, 0, 0, 0, 0, 7, 61
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\__tests__\users.test.ts", "TypeScript", 0, 0, 48, 0, 0, 0, 0, 8, 56
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\dogs.ts", "TypeScript", 0, 0, 92, 0, 0, 0, 0, 9, 101
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\favourites.ts", "TypeScript", 0, 0, 85, 0, 0, 0, 0, 13, 98
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\index.ts", "TypeScript", 0, 0, 6, 0, 0, 0, 1, 3, 10
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\login.ts", "TypeScript", 0, 0, 32, 0, 0, 0, 0, 4, 36
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\types.ts", "TypeScript", 0, 0, 15, 0, 0, 0, 5, 5, 25
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\routes\users.ts", "TypeScript", 0, 0, 29, 0, 0, 0, 0, 3, 32
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\services\__tests__\dog-api.test.ts", "TypeScript", 0, 0, 5, 0, 0, 0, 0, 1, 6
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\services\dog-api.ts", "TypeScript", 0, 0, 38, 0, 0, 0, 2, 6, 46
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\tests\db-test-helpers.ts", "TypeScript", 0, 0, 17, 0, 0, 0, 0, 4, 21
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\tests\test-helpers.ts", "TypeScript", 0, 0, 57, 0, 0, 0, 0, 9, 66
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\utils\jwt-config.ts", "TypeScript", 0, 0, 11, 0, 0, 0, 0, 3, 14
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\utils\type-guards.ts", "TypeScript", 0, 0, 6, 0, 0, 0, 0, 2, 8
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\src\utils\validators.ts", "TypeScript", 0, 0, 14, 0, 0, 0, 0, 3, 17
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\tsconfig.json", "JSON with Comments", 25, 0, 0, 0, 0, 0, 84, 8, 117
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\views\dogs.ejs", "HTML", 0, 0, 0, 0, 10, 0, 0, 2, 12
+"c:\Users\Will\Documents\typescriptsource\DogApiBack\views\index.ejs", "HTML", 0, 0, 0, 0, 10, 0, 0, 2, 12
+"Total", "-", 47, 1, 1509, 13433, 30, 7, 136, 236, 15399

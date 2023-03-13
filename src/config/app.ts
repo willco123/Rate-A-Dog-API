@@ -1,5 +1,5 @@
 import express, { Express } from "express";
-const app: Express = express();
+import cors from "cors";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 import passport from "passport";
@@ -9,8 +9,16 @@ import favouritesRouter from "../routes/favourites";
 import usersRouter from "../routes/users";
 import loginRouter from "../routes/login";
 import dogsRouter from "../routes/dogs";
+const app: Express = express();
 
 app.use(logger("dev"));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    exposedHeaders: "Set-Cookie",
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
