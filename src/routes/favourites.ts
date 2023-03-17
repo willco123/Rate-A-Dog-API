@@ -7,22 +7,24 @@ import {
   deleteFavouriteDog,
 } from "../models/favourite";
 import { TokenContents } from "./types";
-import passport from "passport";
+import { checkAccessToken } from "../middleware/auth";
 import jwt from "jsonwebtoken";
 
-const passportMiddleware = passport.authenticate("jwt", { session: false });
 const mySecret = process.env.JWT_SECRET!;
 
 router.get(
   "/",
-  [passportMiddleware],
+  [checkAccessToken],
   async (
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
   ) => {
     try {
-      const userJWT = jwt.verify(req.cookies["jwt"], mySecret) as TokenContents;
+      const userJWT = jwt.verify(
+        req.cookies["refresh-token"],
+        mySecret,
+      ) as TokenContents;
 
       const userObjectId = userJWT.userPayload;
       const myFavourites = await getFavourites(userObjectId);
@@ -43,7 +45,7 @@ router.get(
 
 router.post(
   "/",
-  [passportMiddleware],
+  [checkAccessToken],
   async (
     req: express.Request,
     res: express.Response,
@@ -57,7 +59,10 @@ router.post(
       if (!dogFromDB) dogFromDB = await saveDogToDB(dog);
       const myDogObjectId = dogFromDB._id;
 
-      const userJWT = jwt.verify(req.cookies["jwt"], mySecret) as TokenContents;
+      const userJWT = jwt.verify(
+        req.cookies["refresh-token"],
+        mySecret,
+      ) as TokenContents;
       const userObjectId = userJWT.userPayload;
 
       await saveFavouriteToDB(userObjectId, myDogObjectId);
@@ -71,14 +76,17 @@ router.post(
 
 router.delete(
   "/",
-  [passportMiddleware],
+  [checkAccessToken],
   async (
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
   ) => {
     try {
-      const userJWT = jwt.verify(req.cookies["jwt"], mySecret) as TokenContents;
+      const userJWT = jwt.verify(
+        req.cookies["refresh-token"],
+        mySecret,
+      ) as TokenContents;
       const userObjectId = userJWT.userPayload;
       const dog = req.body;
 

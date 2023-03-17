@@ -31,7 +31,6 @@ export async function getRandomDog() {
 }
 
 export async function getDogByBreed(breed: string, subBreed?: string | null) {
-  //hit the endpoint, check if breed exists in db, useful as a search function
   try {
     const searchQuery = subBreed
       ? "https://dog.ceo/api/breed/" + breed + "/" + subBreed + "/images/random"

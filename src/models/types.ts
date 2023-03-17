@@ -44,6 +44,9 @@ export type DBFavourites = {
   dogs: Types.ObjectId[];
 } | null;
 
+export type IdObj = {
+  _id: Types.ObjectId;
+};
 // export type UpdateFields = {
 //   username?: string;
 //   password?: string;
@@ -61,10 +64,6 @@ export type DBFavourites = {
 
 // export type UrlObj = {
 //   url: string;
-// };
-
-// export type IdObj = {
-//   _id: Types.ObjectId;
 // };
 
 // export type UserObjId = {

@@ -2,7 +2,6 @@ import express, { Express } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import passport from "passport";
 import "../middleware/passport";
 import indexRouter from "../routes/index";
 import favouritesRouter from "../routes/favourites";
@@ -15,7 +14,8 @@ app.use(logger("dev"));
 app.use(
   cors({
     origin: "http://localhost:3000",
-    exposedHeaders: "Set-Cookie",
+    // exposedHeaders: "Set-Cookie",
+    exposedHeaders: "Authorization",
     credentials: true,
   }),
 );
@@ -24,7 +24,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.set("view engine", "ejs");
 app.use(express.static("public")); //can access public files in browser
-app.use(passport.initialize());
 
 app.use("/", indexRouter);
 app.use("/dogs/favourites", favouritesRouter);

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import isEmail from "validator/lib/isEmail";
-import { UserDetails, UserSearchQuery, DBUserDetails } from "./types";
+import { UserDetails, UserSearchQuery, DBUserDetails, IdObj } from "./types";
 import _ from "lodash";
 import { isNotNull } from "../utils/type-guards";
 
@@ -22,6 +22,10 @@ const UserSchema = new Schema({
     maxLength: 255,
     enum: ["admin", "user"],
     default: "user",
+  },
+  token: {
+    type: String,
+    unique: true,
   },
 });
 
@@ -52,6 +56,35 @@ export async function getUser(userQuery: UserSearchQuery) {
     const user: DBUserDetails = await User.findOne(userQuery);
     return user;
   } catch (err) {
+    throw err;
+  }
+}
+
+export async function saveToken(token: string, userObjectId: string) {
+  try {
+    await User.findOneAndUpdate({ _id: userObjectId }, { token: token });
+  } catch (err: any) {
+    throw err;
+  }
+}
+
+export async function deleteToken(userObjectId: string) {
+  try {
+    await User.findOneAndUpdate(
+      { _id: userObjectId },
+      { $unset: { token: "" } },
+    );
+  } catch (err: any) {
+    throw err;
+  }
+}
+
+export async function getToken(userObjectId: string) {
+  try {
+    const user = await User.findOne({ _id: userObjectId });
+    if (!user) return null;
+    return user.token;
+  } catch (err: any) {
     throw err;
   }
 }

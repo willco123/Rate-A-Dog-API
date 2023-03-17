@@ -8,12 +8,18 @@ import {
 } from "../models/dog";
 import { getRandomDog, isBreed, getDogByBreed } from "../services/dog-api";
 import passport from "passport";
-const passportMiddleware = passport.authenticate("jwt", { session: false });
+const passportMiddleware = passport.authenticate(
+  ["access-token", "refresh-token"],
+  {
+    session: false,
+  },
+);
 import { Dog } from "./types";
+import { checkAccessToken } from "../middleware/auth";
 
 router.get(
   "/random",
-  [passportMiddleware],
+  [checkAccessToken],
   async (
     _req: express.Request,
     res: express.Response,
@@ -28,9 +34,9 @@ router.get(
   },
 );
 
-router.get(
+router.post(
   "/breed",
-  [passportMiddleware],
+  [checkAccessToken],
   async (
     req: express.Request,
     res: express.Response,
@@ -43,7 +49,7 @@ router.get(
         return res.status(404).send("Bad Breed");
 
       const dog = await getDogByBreed(breed, subBreed);
-      return res.send(dog);
+      return res.status(200).send(dog);
     } catch (err) {
       next(err);
     }
@@ -52,7 +58,7 @@ router.get(
 
 router.get(
   "/dbdogs",
-  [passportMiddleware],
+  [checkAccessToken],
   async (
     _req: express.Request,
     res: express.Response,
@@ -75,7 +81,7 @@ router.get(
 
 router.post(
   "/",
-  [passportMiddleware],
+  [checkAccessToken],
   async (
     req: express.Request,
     res: express.Response,
