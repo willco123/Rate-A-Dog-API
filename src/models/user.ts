@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import isEmail from "validator/lib/isEmail";
 import { UserDetails, UserSearchQuery, DBUserDetails, IdObj } from "./types";
 import _ from "lodash";
@@ -25,7 +25,16 @@ const UserSchema = new Schema({
   },
   token: {
     type: String,
-    unique: true,
+    index: {
+      partialFilterExpression: { token: { $type: "string" } },
+    },
+  },
+
+  urls: {
+    type: Array,
+    of: Types.ObjectId,
+    maxLength: 254,
+    ref: "UrlRating",
   },
 });
 
@@ -60,7 +69,7 @@ export async function getUser(userQuery: UserSearchQuery) {
   }
 }
 
-export async function saveToken(token: string, userObjectId: string) {
+export async function saveToken(token: string, userObjectId: string | IdObj) {
   try {
     await User.findOneAndUpdate({ _id: userObjectId }, { token: token });
   } catch (err: any) {
@@ -68,7 +77,7 @@ export async function saveToken(token: string, userObjectId: string) {
   }
 }
 
-export async function deleteToken(userObjectId: string) {
+export async function deleteToken(userObjectId: string | IdObj) {
   try {
     await User.findOneAndUpdate(
       { _id: userObjectId },
@@ -79,11 +88,25 @@ export async function deleteToken(userObjectId: string) {
   }
 }
 
-export async function getToken(userObjectId: string) {
+export async function getToken(userObjectId: string | IdObj) {
   try {
     const user = await User.findOne({ _id: userObjectId });
     if (!user) return null;
     return user.token;
+  } catch (err: any) {
+    throw err;
+  }
+}
+
+export async function saveUrlIdToUser(urlId: Types.ObjectId, userId: string) {
+  try {
+    const user = await User.findOneAndUpdate(
+      { _id: userId },
+      { $addToSet: { urls: urlId } },
+      { new: true },
+    );
+    if (!user) return null;
+    return user;
   } catch (err: any) {
     throw err;
   }

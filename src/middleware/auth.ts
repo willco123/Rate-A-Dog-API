@@ -9,6 +9,7 @@ import {
   generateRefreshToken,
   generateAccessToken,
 } from "../utils/token-config";
+import type { UserDetails, Login } from "./types";
 const secret = process.env.JWT_SECRET!;
 
 export interface CustomRequest extends Request {
@@ -42,7 +43,7 @@ export const login: RequestHandler = async (req: CustomRequest, res, next) => {
   const userId = user._id as unknown as string; //fix this
 
   const refreshToken = await generateRefreshToken(userId);
-  const accessToken = generateAccessToken(true);
+  const accessToken = generateAccessToken(userId); //should this really use userId?
 
   req.accessToken = accessToken;
   req.refreshToken = refreshToken;
@@ -50,18 +51,20 @@ export const login: RequestHandler = async (req: CustomRequest, res, next) => {
   next();
 };
 
+//needs refactoring
 export const checkAccessToken: RequestHandler = async (req, res, next) => {
   try {
     const accessToken = req.headers["authorization"];
-
     if (!accessToken) return checkRefreshToken(req, res, next);
-    const decondedToken = jwt.verify(accessToken, secret) as JwtTokenPayload;
-    const expiration = decondedToken.expiration;
+    const decodedToken = jwt.verify(accessToken, secret) as JwtTokenPayload;
+    const expiration = decodedToken.expiration;
 
     if (Date.now() > expiration) return checkRefreshToken(req, res, next);
+    req.body.user = decodedToken.userPayload;
     next();
   } catch (err: any) {
-    if ((err.message = "invalid signature")) res.status(401).send("Bad Token");
+    if ((err.message = "invalid signature"))
+      return res.status(400).clearCookie("refresh-token").send("Bad Token");
 
     next(err);
   }
@@ -74,11 +77,12 @@ export const checkRefreshToken: RequestHandler = async (
 ) => {
   try {
     const refreshToken = req.cookies["refresh-token"];
+
     if (!refreshToken)
       return res.status(401).send("Unauthorized, please log in");
-    const decondedToken = jwt.verify(refreshToken, secret) as JwtTokenPayload;
-    const userObjectId: string = decondedToken.userPayload as string;
-    const { expiration } = decondedToken;
+    const decodedToken = jwt.verify(refreshToken, secret) as JwtTokenPayload;
+    const userObjectId: string = decodedToken.userPayload as string;
+    const { expiration } = decodedToken;
 
     if (Date.now() > expiration) {
       await deleteToken(userObjectId);
@@ -93,10 +97,16 @@ export const checkRefreshToken: RequestHandler = async (
     if (refreshTokenFromDB !== refreshToken)
       return res.status(401).send("Unauthorized");
 
-    const accessToken = generateAccessToken(true);
+    const accessToken = generateAccessToken(decodedToken.userPayload);
     res.setHeader("Authorization", accessToken);
+    req.body.user = decodedToken.userPayload;
     next();
-  } catch (err) {
+  } catch (err: any) {
+    if ((err.message = "invalid signature"))
+      return res.status(400).clearCookie("refresh-token").send("Bad Token");
     next(err);
   }
 };
+
+//maybe require both refresh and access tokens to be present to allow access, currently
+//only access token is required (although it is a short-lived token with no user info in payload)

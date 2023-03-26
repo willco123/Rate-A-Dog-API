@@ -19,7 +19,9 @@ const FavouriteSchema = new Schema({
   ],
 });
 
-export async function createFavouriteDoc(userObjectId: Types.ObjectId) {
+export async function createFavouriteDoc(
+  userObjectId: Types.ObjectId | string,
+) {
   try {
     let myFavourite = new Favourite({ user: userObjectId });
     await myFavourite.save();

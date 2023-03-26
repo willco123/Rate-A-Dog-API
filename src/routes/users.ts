@@ -7,7 +7,7 @@ import bcrypt from "bcrypt";
 import { UserDetails } from "./types";
 
 router.post(
-  "/",
+  "/register",
   [authNewUser, checkUniqueness],
   async (
     req: express.Request,
@@ -21,7 +21,7 @@ router.post(
       newUser.password = password;
       const user = await saveUserToDB(newUser);
       await createFavouriteDoc(user._id);
-      return res.send("New User added");
+      return res.status(200).send("New User added");
     } catch (err: any) {
       next(err);
     }

@@ -1,12 +1,12 @@
 import express from "express";
 const router = express.Router();
-import { saveDogToDB, getDogByUrlDB } from "../models/dog";
+import { saveDogToDB, getDogByField } from "../models/dog";
 import {
   saveFavouriteToDB,
   getFavourites,
   deleteFavouriteDog,
 } from "../models/favourite";
-import { TokenContents } from "./types";
+import { TokenContents, Dog } from "./types";
 import { checkAccessToken } from "../middleware/auth";
 import jwt from "jsonwebtoken";
 
@@ -52,11 +52,11 @@ router.post(
     next: express.NextFunction,
   ) => {
     try {
-      const dog = req.body;
+      const dog: Dog = req.body;
       const url = dog.url;
 
-      let dogFromDB = await getDogByUrlDB(url);
-      if (!dogFromDB) dogFromDB = await saveDogToDB(dog);
+      let dogFromDB = await getDogByField({ breed: dog.breed });
+      if (!dogFromDB) dogFromDB = await saveDogToDB(dog.breed);
       const myDogObjectId = dogFromDB._id;
 
       const userJWT = jwt.verify(
@@ -90,7 +90,7 @@ router.delete(
       const userObjectId = userJWT.userPayload;
       const dog = req.body;
 
-      let dogFromDB = await getDogByUrlDB(dog);
+      let dogFromDB = await getDogByField({ breed: dog.breed });
       if (!dogFromDB) dogFromDB = await saveDogToDB(dog);
       const myDogObjectId = dogFromDB._id;
 

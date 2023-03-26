@@ -15,7 +15,7 @@ app.use(
   cors({
     origin: "http://localhost:3000",
     // exposedHeaders: "Set-Cookie",
-    exposedHeaders: "Authorization",
+    exposedHeaders: ["Authorization", "authorization"],
     credentials: true,
   }),
 );
@@ -26,9 +26,9 @@ app.set("view engine", "ejs");
 app.use(express.static("public")); //can access public files in browser
 
 app.use("/", indexRouter);
-app.use("/dogs/favourites", favouritesRouter);
+app.use("/favourites", favouritesRouter);
 app.use("/dogs", dogsRouter);
-app.use("/users", usersRouter);
+app.use("/", usersRouter);
 app.use("/", loginRouter);
 
 app.get("/*", (req, res) => {

@@ -18,8 +18,6 @@ passport.use(
     },
     (jwtPayload, done) => {
       const { expiration } = jwtPayload;
-      console.log("first");
-      console.log(jwtPayload);
       if (Date.now() > expiration) {
         return done("Unauthorized", false);
       }
@@ -51,4 +49,10 @@ passport.use(
 //maybe with custom callback func
 //seems to be a firefox exclusive error
 
-const passportMiddleware = passport.authenticate("jwt", { session: false });
+// const passportMiddleware = passport.authenticate("jwt", { session: false });
+// const passportMiddleware = passport.authenticate(
+//   ["access-token", "refresh-token"],
+//   {
+//     session: false,
+//   },
+// );

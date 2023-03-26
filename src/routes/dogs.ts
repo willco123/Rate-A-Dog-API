@@ -1,19 +1,22 @@
 import express from "express";
 const router = express.Router();
+
 import {
   getAllDogsDB,
-  getDogByUrlDB,
   saveDogToDB,
-  rateDogDB,
+  getDogByField,
+  saveUrl,
+  updateUrlRating,
+  saveSubBreedToDB,
+  getUrl,
+  saveUrlIdToDog,
+  reduceRatings,
+  sumVotes,
+  aggregateBySubBreed,
 } from "../models/dog";
+import { saveUrlIdToUser } from "../models/user";
 import { getRandomDog, isBreed, getDogByBreed } from "../services/dog-api";
-import passport from "passport";
-const passportMiddleware = passport.authenticate(
-  ["access-token", "refresh-token"],
-  {
-    session: false,
-  },
-);
+
 import { Dog } from "./types";
 import { checkAccessToken } from "../middleware/auth";
 
@@ -58,20 +61,40 @@ router.post(
 
 router.get(
   "/dbdogs",
-  [checkAccessToken],
+
   async (
     _req: express.Request,
     res: express.Response,
     next: express.NextFunction,
   ) => {
     try {
-      let dogs = await getAllDogsDB();
+      const dogs = await getAllDogsDB();
+      const outputArrayPromise = dogs.map(async ({ breed, subBreed }) => {
+        const newRating: number[] = [];
+        const numberOfRates: number[] = [];
+        const urlArray: any = [];
 
-      const outputArray = dogs.map(({ url, breed, rating }) => ({
-        url,
-        breed,
-        rating,
-      }));
+        const iterRange = subBreed.length ? subBreed.length : 1;
+
+        for (let i = 0; i < iterRange; i++) {
+          const response = await aggregateBySubBreed(i, breed);
+
+          newRating.push(reduceRatings(response.averageRatingsArray));
+          numberOfRates.push(sumVotes(response.ratesArray));
+          urlArray.push(response.urlArray);
+        }
+
+        return {
+          url: urlArray,
+          breed,
+          subBreed,
+          rating: newRating,
+          numberOfRates: numberOfRates,
+        };
+      });
+
+      const outputArray = await Promise.all(outputArrayPromise);
+      console.log(outputArray);
       return res.status(200).send(outputArray);
     } catch (err) {
       next(err);
@@ -89,14 +112,38 @@ router.post(
   ) => {
     try {
       const dog: Dog = req.body.dog;
-      const rating = req.body.rating;
-      const url = dog.url;
-      let dogFromDB = await getDogByUrlDB(url);
-      if (!dogFromDB) dogFromDB = await saveDogToDB(dog);
+      if (!req.body.user) throw new Error();
+      const userId: string = req.body.user;
+      const { breed, subBreed, url, rating } = dog;
 
-      const dogId = dogFromDB._id;
-      await rateDogDB(dogId, rating);
-      return res.status(200).send("Dog added to DB!");
+      const urlFromDB = await saveUrl(url, userId);
+
+      if (rating) await updateUrlRating(url, userId, rating);
+
+      const urlId = urlFromDB._id;
+      await saveUrlIdToUser(urlId, userId);
+
+      let dogFromDB = await getDogByField({ breed: breed });
+      if (!dogFromDB) dogFromDB = await saveDogToDB(breed);
+
+      let { _id: dbId, subBreed: dbSubBreed } = dogFromDB;
+
+      if (subBreed && !dbSubBreed.includes(subBreed)) {
+        dogFromDB = await saveSubBreedToDB(dbId, subBreed);
+        dbSubBreed = dogFromDB.subBreed;
+      }
+
+      let subBreedIndex = dbSubBreed.findIndex((element) => {
+        return element === subBreed;
+      });
+
+      if (subBreedIndex === -1) subBreedIndex = 0;
+
+      await saveUrlIdToDog(urlId, dbId, subBreedIndex);
+
+      const response = await aggregateBySubBreed(subBreedIndex, breed);
+
+      return res.status(200).send("Dog Rated!");
     } catch (err) {
       next(err);
     }

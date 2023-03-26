@@ -20,5 +20,6 @@ export type UserDetails = {
 export type Dog = {
   url: string;
   breed: string;
+  subBreed?: string;
   rating?: number;
 };

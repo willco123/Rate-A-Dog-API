@@ -1,5 +1,7 @@
 import { Types } from "mongoose";
 
+export type SearchFields = { _id: Types.ObjectId } | { breed: string };
+
 export type UserDetails = {
   username: string;
   password: string;
@@ -9,7 +11,13 @@ export type UserDetails = {
 export type Dog = {
   url: string;
   breed: string;
+  subBreed?: string;
   rating?: number;
+};
+
+export type SaveNewDog = {
+  breed: string;
+  subBreed?: string;
 };
 
 export type UserSearchQuery = {
@@ -18,10 +26,11 @@ export type UserSearchQuery = {
 
 export type DBDog = {
   _id: Types.ObjectId;
-  url: string;
+  url: string[];
   breed: string;
-  rating: number;
-  numberOfRates: number;
+  subBreed: string[];
+  rating: number[];
+  numberOfRates: number[];
 } | null;
 
 export type DBUserDetails = {

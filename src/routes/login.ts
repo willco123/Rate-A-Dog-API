@@ -4,6 +4,7 @@ import { login } from "../middleware/auth";
 import { deleteToken } from "../models/user";
 import type { CustomRequest } from "../middleware/auth";
 import type { JwtTokenPayload } from "../utils/token-config";
+import { checkAccessToken } from "../middleware/auth";
 const router = express.Router();
 const secret = process.env.JWT_SECRET!;
 
@@ -34,7 +35,7 @@ router.post(
   },
 );
 
-router.get("/logout", async (req, res) => {
+router.get("/logout", async (req, res, next) => {
   try {
     const refreshToken = req.cookies["refresh-token"];
     if (!refreshToken) return res.status(200).send("Already logged out");
@@ -46,10 +47,27 @@ router.get("/logout", async (req, res) => {
       message: "You have logged out",
     });
   } catch (err: any) {
-    throw new err();
+    if ((err.message = "invalid signature"))
+      return res.status(400).clearCookie("refresh-token").send("Bad Token");
+    next(err);
   }
 });
 
-export default router;
+router.get(
+  //this route is for when a user refreshes the page, it does not refresh the access token
+  "/refresh",
+  [checkAccessToken],
+  async (
+    _req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    try {
+      return res.status(200).send(true);
+    } catch (err: any) {
+      next(err);
+    }
+  },
+);
 
-//need to test for expired refresh token
+export default router;

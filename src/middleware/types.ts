@@ -1,10 +1,10 @@
-type UserDetails = {
+export type UserDetails = {
   username: string;
   password: string;
   email: string;
 };
 
-type Login = {
+export type Login = {
   username: string;
   password: string;
 };
