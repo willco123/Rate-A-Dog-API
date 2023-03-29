@@ -8,13 +8,18 @@ import {
   saveUrl,
   updateUrlRating,
   saveSubBreedToDB,
-  getUrl,
   saveUrlIdToDog,
-  reduceRatings,
+  averageRatings,
   sumVotes,
   aggregateBySubBreed,
+  aggregateUserRatings,
+  aggregateAllGroupBySubBreed,
 } from "../models/dog";
-import { saveUrlIdToUser } from "../models/user";
+import {
+  saveUrlIdToUser,
+  getUserUrlRatings,
+  getUserUrls,
+} from "../models/user";
 import { getRandomDog, isBreed, getDogByBreed } from "../services/dog-api";
 
 import { Dog } from "./types";
@@ -60,44 +65,37 @@ router.post(
 );
 
 router.get(
-  "/dbdogs",
-
+  "/",
   async (
     _req: express.Request,
     res: express.Response,
     next: express.NextFunction,
   ) => {
     try {
-      const dogs = await getAllDogsDB();
-      const outputArrayPromise = dogs.map(async ({ breed, subBreed }) => {
-        const newRating: number[] = [];
-        const numberOfRates: number[] = [];
-        const urlArray: any = [];
+      const response = await aggregateAllGroupBySubBreed();
 
-        const iterRange = subBreed.length ? subBreed.length : 1;
-
-        for (let i = 0; i < iterRange; i++) {
-          const response = await aggregateBySubBreed(i, breed);
-
-          newRating.push(reduceRatings(response.averageRatingsArray));
-          numberOfRates.push(sumVotes(response.ratesArray));
-          urlArray.push(response.urlArray);
-        }
-
-        return {
-          url: urlArray,
-          breed,
-          subBreed,
-          rating: newRating,
-          numberOfRates: numberOfRates,
-        };
-      });
-
-      const outputArray = await Promise.all(outputArrayPromise);
-      console.log(outputArray);
-      return res.status(200).send(outputArray);
+      return res.status(200).send(response);
     } catch (err) {
       next(err);
+    }
+  },
+);
+
+router.get(
+  "/user",
+  [checkAccessToken],
+  async (
+    req: express.Request,
+    res: express.Response,
+    _next: express.NextFunction,
+  ) => {
+    try {
+      const userId = req.body.user;
+      const userUrls = await getUserUrls(userId);
+      const aggregateUser = await aggregateUserRatings(userUrls, userId);
+      return res.status(200).send(aggregateUser);
+    } catch (error) {
+      throw new Error();
     }
   },
 );
@@ -141,9 +139,7 @@ router.post(
 
       await saveUrlIdToDog(urlId, dbId, subBreedIndex);
 
-      const response = await aggregateBySubBreed(subBreedIndex, breed);
-
-      return res.status(200).send("Dog Rated!");
+      return res.status(200);
     } catch (err) {
       next(err);
     }

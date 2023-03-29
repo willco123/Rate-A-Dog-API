@@ -61,6 +61,7 @@ export async function getDogByField(field: SearchFields) {
 }
 
 export async function saveSubBreedToDB(id: Types.ObjectId, subBreed: string) {
+  //could store null here if subBreed==null|undefined
   try {
     const savedDog = await Dog.findOneAndUpdate(
       { _id: id },
@@ -231,7 +232,71 @@ export async function aggregateBySubBreed(index: number, breed: string) {
   return output;
 }
 
-export function reduceRatings(myArray: number[]) {
+export async function aggregateAllGroupBySubBreed() {
+  const allRatingsAggregate = await Dog.aggregate([
+    //outputs all urls and their average ratings and votes, grouped by subBreed
+
+    {
+      $project: {
+        breed: 1,
+        urlSubBreed: {
+          $zip: { inputs: ["$subBreed", "$urlData"], useLongestLength: true }, //plugs null into the shorter array
+        },
+      },
+    },
+
+    { $unwind: "$urlSubBreed" },
+
+    {
+      $lookup: {
+        from: "urlratings",
+        localField: "urlSubBreed.1",
+        foreignField: "_id",
+        as: "urlRatingData",
+      },
+    },
+    {
+      $unwind: "$urlRatingData",
+    },
+    {
+      $group: {
+        _id: { urlSubBreed: "$urlSubBreed" },
+        breed: { $addToSet: "$breed" },
+        // avgRating: {//unsure how to average an array of arrays
+        //   $avg: { $arrayElemAt: ["$urlRatingData.userRatingData.rating", 0] },
+        // },
+        rating: {
+          $push: "$urlRatingData.userRatingData.rating",
+        },
+
+        numberOfRates: { $sum: "$urlRatingData.numberOfRates" },
+        url: { $addToSet: "$urlRatingData.url" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        breed: 1,
+        subBreed: { $arrayElemAt: ["$_id.urlSubBreed", 0] },
+        rating: 1,
+        numberOfRates: 1,
+        test: 1,
+        url: 1,
+      },
+    },
+  ]);
+
+  const output = allRatingsAggregate.map((element) => {
+    const outputRatings = element.rating.flat(1);
+    element.breed = element.breed[0];
+    element.rating = averageRatings(outputRatings);
+    return element;
+  });
+
+  return output;
+}
+
+export function averageRatings(myArray: number[]) {
   const average =
     myArray.reduce(
       (accumulator, currentValue) => accumulator + currentValue,
@@ -248,4 +313,100 @@ export function sumVotes(myArray: number[]) {
   );
 
   return sum;
+}
+
+export async function aggregateUserRatings(urlIdArray: string, userId: string) {
+  try {
+    const id = new Types.ObjectId(userId);
+    const userRatings = await Dog.aggregate([
+      {
+        $match: {
+          urlData: {
+            $elemMatch: {
+              $elemMatch: { $in: urlIdArray },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          breed: 1,
+          urlSubBreed: {
+            $zip: { inputs: ["$subBreed", "$urlData"], useLongestLength: true }, //plugs null into the shorter array
+          },
+        },
+      },
+
+      { $unwind: "$urlSubBreed" },
+
+      {
+        $lookup: {
+          from: "urlratings",
+          localField: "urlSubBreed.1",
+          foreignField: "_id",
+          as: "urlRatingData",
+        },
+      },
+      {
+        $unwind: "$urlRatingData",
+      },
+      {
+        $group: {
+          _id: { urlSubBreed: "$urlSubBreed" },
+          breed: { $addToSet: "$breed" },
+          urlRatings: {
+            $push: {
+              userRating: {
+                $arrayElemAt: [
+                  {
+                    $filter: {
+                      input: "$urlRatingData.userRatingData",
+                      as: "userRating",
+                      cond: { $eq: ["$$userRating.userId", id] },
+                    },
+                  },
+                  0,
+                ],
+              },
+              url: "$urlRatingData.url",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          breed: 1,
+          subBreed: { $arrayElemAt: ["$_id.urlSubBreed", 0] },
+          urlRatings: {
+            $filter: {
+              input: "$urlRatings",
+              as: "rating",
+              cond: {
+                $eq: [{ $type: "$$rating.userRating" }, "object"],
+              },
+            },
+          },
+        },
+      },
+
+      {
+        $project: {
+          breed: 1,
+          subBreed: 1,
+          urlRatings: {
+            $map: {
+              input: "$urlRatings",
+              as: "rating",
+              in: ["$$rating.userRating.rating", "$$rating.url"],
+            },
+          },
+        },
+      },
+    ]);
+
+    return userRatings;
+  } catch (error: any) {
+    throw new Error(error);
+  }
 }

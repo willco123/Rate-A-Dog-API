@@ -112,6 +112,99 @@ export async function saveUrlIdToUser(urlId: Types.ObjectId, userId: string) {
   }
 }
 
+export async function getUserUrlRatings(userId: string) {
+  try {
+    const id = new Types.ObjectId(userId);
+    const userUrls = await User.aggregate([
+      { $match: { _id: id } },
+      { $project: { urls: 1 } },
+      {
+        $lookup: {
+          from: "urlratings",
+          localField: "urls",
+          foreignField: "_id",
+          as: "urlData",
+        },
+      },
+      {
+        $unwind: "$urlData",
+      },
+      {
+        $group: {
+          _id: "$_id",
+          urlData: { $push: "$urlData._id" },
+          //just to check that each url is mapped to each rating
+          // urlRatings: {
+          //   $push: {
+          //     urls: "$urlData.url",
+          //     ratings: {
+          //       $arrayElemAt: [
+          //         {
+          //           $filter: {
+          //             input: "$urlData.userRatingData",
+          //             as: "userRating",
+          //             cond: { $eq: ["$$userRating.userId", id] },
+          //           },
+          //         },
+          //         0,
+          //       ],
+          //     },
+          //   },
+          // },
+          urls: { $push: "$urlData.url" },
+          ratings: {
+            $push: {
+              $arrayElemAt: [
+                {
+                  $filter: {
+                    input: "$urlData.userRatingData",
+                    as: "userRating",
+                    cond: { $eq: ["$$userRating.userId", id] },
+                  },
+                },
+                0,
+              ],
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          urlData: 1,
+          urls: 1,
+          ratings: {
+            $map: {
+              input: "$ratings",
+              as: "rating",
+              in: "$$rating.rating",
+            },
+          },
+        },
+      },
+    ]);
+    //assuming the above code gives a 1-1 mapping of urls to ratings then it should be fine
+    //assumption: group goes through each urlId and pushes rating and url at the same index
+    if (!userUrls) return null;
+    // console.log(userUrls[0]);
+    return userUrls[0];
+  } catch (err: any) {
+    throw err;
+  }
+}
+
+export async function getUserUrls(userId: string) {
+  try {
+    const id = new Types.ObjectId(userId);
+    const userUrls = await User.aggregate([
+      { $match: { _id: id } },
+      { $project: { _id: 0, urls: 1 } },
+    ]);
+    if (!userUrls) return null;
+    return userUrls[0].urls;
+  } catch (err: any) {
+    throw err;
+  }
+}
 // export async function deleteUserByUsername(username: UsernameObj) {
 //   //admin only
 //   User.deleteOne(username);
