@@ -392,7 +392,7 @@ export async function aggregateUserRatings(urlIdArray: string, userId: string) {
 
       {
         $project: {
-          breed: 1,
+          breed: { $arrayElemAt: ["$breed", 0] },
           subBreed: 1,
           urlRatings: {
             $map: {
