@@ -232,6 +232,74 @@ export async function aggregateBySubBreed(index: number, breed: string) {
   return output;
 }
 
+export async function aggregateAll() {
+  try {
+    const allRatings = await Dog.aggregate([
+      {
+        $project: {
+          breed: 1,
+          urlSubBreed: {
+            $zip: { inputs: ["$subBreed", "$urlData"], useLongestLength: true }, //plugs null into the shorter array
+          },
+        },
+      },
+
+      { $unwind: "$urlSubBreed" },
+
+      {
+        $lookup: {
+          from: "urlratings",
+          localField: "urlSubBreed.1",
+          foreignField: "_id",
+          as: "urlRatingData",
+        },
+      },
+      {
+        $unwind: "$urlRatingData",
+      },
+      {
+        $group: {
+          _id: { urlSubBreed: "$urlSubBreed" },
+          breed: { $addToSet: "$breed" },
+          urlRatings: {
+            $push: {
+              avgRating: { $avg: "$urlRatingData.userRatingData.rating" },
+              url: "$urlRatingData.url",
+              numberOfRates: "$urlRatingData.numberOfRates",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          breed: { $arrayElemAt: ["$breed", 0] },
+          subBreed: { $arrayElemAt: ["$_id.urlSubBreed", 0] },
+          urlRatings: 1,
+        },
+      },
+
+      // {
+      //   $project: {
+      //     breed: { $arrayElemAt: ["$breed", 0] },
+      //     subBreed: 1,
+      //     urlRatings: {
+      //       $map: {
+      //         input: "$urlRatings",
+      //         as: "rating",
+      //         in: ["$$rating.userRating.rating", "$$rating.url"],
+      //       },
+      //     },
+      //   },
+      // },
+    ]);
+
+    return allRatings;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
 export async function aggregateAllGroupBySubBreed() {
   const allRatingsAggregate = await Dog.aggregate([
     //outputs all urls and their average ratings and votes, grouped by subBreed

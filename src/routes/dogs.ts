@@ -14,6 +14,7 @@ import {
   aggregateBySubBreed,
   aggregateUserRatings,
   aggregateAllGroupBySubBreed,
+  aggregateAll,
 } from "../models/dog";
 import {
   saveUrlIdToUser,
@@ -73,7 +74,24 @@ router.get(
   ) => {
     try {
       const response = await aggregateAllGroupBySubBreed();
-
+      return res.status(200).send(response);
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+router.get(
+  "/all",
+  async (
+    _req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    try {
+      const response = await aggregateAll();
+      response.forEach((element) => {
+        console.log(element);
+      });
       return res.status(200).send(response);
     } catch (err) {
       next(err);
