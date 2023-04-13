@@ -80,3 +80,17 @@ export type IdObj = {
 // };
 
 // export type UserSearchQuery = UsernameObj | EmailObj | IdObj;
+
+export type UrlRatingData = {
+  breed: string;
+  subBreed: string | null;
+  url: string;
+  numberOfRates: number;
+  userRatingData: UrlUserRatingData[];
+  averageRating: number | null;
+};
+
+type UrlUserRatingData = {
+  url: string;
+  rating: number | null;
+};

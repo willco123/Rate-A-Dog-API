@@ -1,6 +1,7 @@
 import mongoose, { Types } from "mongoose";
-import { Dog, DBDog, SearchFields, IdObj } from "./types";
+import { Dog, SearchFields, IdObj } from "./types";
 import { isNotNull } from "../utils/type-guards";
+import type { UrlRatingData } from "./types";
 const Schema = mongoose.Schema;
 
 const UserRatingSchema = new Schema({
@@ -13,7 +14,7 @@ const UrlRatingSchema = new Schema({
   numberOfRates: { type: Number, default: 0 },
   userRatingData: {
     type: [UserRatingSchema],
-    required: true,
+    // required: true,
     validate: [
       {
         validator: function (newDocs: any) {
@@ -51,6 +52,20 @@ export async function saveDogToDB(breed: string) {
   }
 }
 
+export async function saveDogToDB2(breed: string) {
+  try {
+    const aDog = Dog.findOneAndUpdate(
+      { breed: breed },
+      { breed: breed },
+      { upsert: true, new: true },
+    );
+
+    return aDog;
+  } catch (err: any) {
+    throw err;
+  }
+}
+
 export async function getDogByField(field: SearchFields) {
   try {
     const dog = await Dog.findOne(field);
@@ -63,9 +78,16 @@ export async function getDogByField(field: SearchFields) {
 export async function saveSubBreedToDB(id: Types.ObjectId, subBreed: string) {
   //could store null here if subBreed==null|undefined
   try {
-    const savedDog = await Dog.findOneAndUpdate(
+    let savedDog = await Dog.findOneAndUpdate(
       { _id: id },
       { $addToSet: { subBreed: subBreed } },
+      { returnDocument: "after" },
+    );
+    if (savedDog === null) throw new Error();
+    const index = savedDog.subBreed.findIndex((item) => item === subBreed);
+    savedDog = await Dog.findOneAndUpdate(
+      { _id: id },
+      { $set: { [`urlData.${index}`]: [] } },
       { returnDocument: "after" },
     );
     if (savedDog === null) throw new Error();
@@ -92,6 +114,24 @@ export async function saveUrlIdToDog(
   }
 }
 
+export async function saveManyUrlIdsToDog(
+  urlIds: IdObj[],
+  dogId: IdObj,
+  index: number,
+) {
+  try {
+    const response = await Dog.updateOne(
+      { _id: dogId },
+      { $addToSet: { [`urlData.${index}`]: { $each: urlIds } } },
+      { returnDocument: "after" },
+    );
+    return response;
+  } catch (err: any) {
+    console.log(err);
+    throw new Error(err);
+  }
+}
+
 export async function getUrl(url: string) {
   try {
     const dog = await UrlRating.findOne({ url: url });
@@ -113,7 +153,49 @@ export async function getAllDogsDB() {
   }
 }
 
-export async function saveUrl(url: string, userId: string) {
+export async function saveUrl(url: string) {
+  try {
+    const newUrl = new UrlRating({ url: url });
+    const savedUrl = await newUrl.save();
+
+    return savedUrl;
+  } catch (err: any) {
+    if (err.code === 11000) {
+      // console.log(err.keyValue.url);
+      const urlFromDb = await UrlRating.findOne({ url: url });
+      if (!urlFromDb) throw new Error();
+      return urlFromDb;
+    }
+    throw err;
+  }
+}
+
+export async function saveManyUrls(urls: { url: string }[]) {
+  try {
+    const savedUrls = await UrlRating.insertMany(urls, { ordered: false });
+
+    const output = savedUrls.map((element: any) => {
+      const { _id } = element;
+      return _id;
+    });
+    return output;
+  } catch (err: any) {
+    if (err.code === 11000) {
+      // const collisions = err.writeErrors.map((element: any) => {
+      //   const { url, _id } = element.err.op;
+      //   return { url: url, _id: _id };
+      // });
+      const insertedDocs = err.insertedDocs.map((element: any) => {
+        const { _id } = element;
+        return { _id: _id };
+      });
+      return insertedDocs;
+    }
+    throw new Error();
+  }
+}
+
+export async function saveUrlWithUser(url: string, userId: string) {
   try {
     const savedDog = await UrlRating.findOneAndUpdate(
       { url: url, "userRatingData.userId": { $ne: userId } },
@@ -278,20 +360,6 @@ export async function aggregateAll() {
           urlRatings: 1,
         },
       },
-
-      // {
-      //   $project: {
-      //     breed: { $arrayElemAt: ["$breed", 0] },
-      //     subBreed: 1,
-      //     urlRatings: {
-      //       $map: {
-      //         input: "$urlRatings",
-      //         as: "rating",
-      //         in: ["$$rating.userRating.rating", "$$rating.url"],
-      //       },
-      //     },
-      //   },
-      // },
     ]);
 
     return allRatings;
@@ -474,6 +542,247 @@ export async function aggregateUserRatings(urlIdArray: string, userId: string) {
     ]);
 
     return userRatings;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function aggregateThirtyRandomDocs() {
+  try {
+    const thirtyDocs: UrlRatingData[] = await Dog.aggregate([
+      {
+        $project: {
+          breed: 1,
+          urlSubBreed: {
+            $zip: { inputs: ["$subBreed", "$urlData"], useLongestLength: true }, //plugs null into the shorter array
+          },
+        },
+      },
+
+      { $unwind: "$urlSubBreed" },
+
+      {
+        $lookup: {
+          from: "urlratings",
+          localField: "urlSubBreed.1",
+          foreignField: "_id",
+          as: "urlRatingData",
+        },
+      },
+      {
+        $unwind: "$urlRatingData",
+      },
+      {
+        $group: {
+          _id: { urlSubBreed: "$urlSubBreed" },
+          breed: { $addToSet: "$breed" },
+          urlRatings: {
+            $push: {
+              avgRating: { $avg: "$urlRatingData.userRatingData.rating" },
+              url: "$urlRatingData.url",
+              numberOfRates: "$urlRatingData.numberOfRates",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          breed: { $arrayElemAt: ["$breed", 0] },
+          subBreed: { $arrayElemAt: ["$_id.urlSubBreed", 0] },
+          urlRatings: 1,
+        },
+      },
+
+      { $sample: { size: 30 } },
+    ]);
+
+    return thirtyDocs;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function aggregateFiftyRandomDocs() {
+  try {
+    const fiftyDocs: UrlRatingData[] = await Dog.aggregate([
+      {
+        $project: {
+          breed: 1,
+          urlSubBreed: {
+            $zip: { inputs: ["$subBreed", "$urlData"], useLongestLength: true }, //plugs null into the shorter array
+          },
+        },
+      },
+
+      { $unwind: "$urlSubBreed" },
+
+      {
+        $lookup: {
+          from: "urlratings",
+          localField: "urlSubBreed.1",
+          foreignField: "_id",
+          as: "urlRatingData",
+        },
+      },
+      {
+        $unwind: "$urlRatingData",
+      },
+
+      { $sample: { size: 50 } },
+
+      {
+        $project: {
+          _id: 0,
+          breed: 1,
+          subBreed: { $arrayElemAt: ["$urlSubBreed", 0] },
+          url: "$urlRatingData.url",
+          numberOfRates: "$urlRatingData.numberOfRates",
+          userRatingData: "$urlRatingData.userRatingData",
+
+          averageRating: {
+            $avg: { $avg: "$urlRatingData.userRatingData.rating" },
+          },
+        },
+      },
+    ]);
+
+    return fiftyDocs;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function aggregateTenRandomWithExclusions(
+  currentlyLoadedDocuments: UrlRatingData[],
+) {
+  try {
+    const excludedBreedsAndSubBreeds = currentlyLoadedDocuments.map((doc) => ({
+      breed: doc.breed,
+      subBreed: doc.subBreed,
+    }));
+    const tenDocs: UrlRatingData[] = await Dog.aggregate([
+      {
+        $match: {
+          breed: { $nin: excludedBreedsAndSubBreeds.map((doc) => doc.breed) },
+          subBreed: {
+            $nin: excludedBreedsAndSubBreeds.map((doc) => doc.subBreed),
+          },
+        },
+      },
+      {
+        $project: {
+          breed: 1,
+          urlSubBreed: {
+            $zip: { inputs: ["$subBreed", "$urlData"], useLongestLength: true }, //plugs null into the shorter array
+          },
+        },
+      },
+
+      { $unwind: "$urlSubBreed" },
+
+      {
+        $lookup: {
+          from: "urlratings",
+          localField: "urlSubBreed.1",
+          foreignField: "_id",
+          as: "urlRatingData",
+        },
+      },
+      {
+        $unwind: "$urlRatingData",
+      },
+      {
+        $group: {
+          _id: { urlSubBreed: "$urlSubBreed" },
+          breed: { $addToSet: "$breed" },
+          urlRatings: {
+            $push: {
+              avgRating: { $avg: "$urlRatingData.userRatingData.rating" },
+              url: "$urlRatingData.url",
+              numberOfRates: "$urlRatingData.numberOfRates",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          breed: { $arrayElemAt: ["$breed", 0] },
+          subBreed: { $arrayElemAt: ["$_id.urlSubBreed", 0] },
+          urlRatings: 1,
+        },
+      },
+
+      { $sample: { size: 10 } },
+    ]);
+
+    return tenDocs;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function aggregateTwentyRandomWithExclusions(
+  currentlyLoadedDocuments: UrlRatingData[],
+) {
+  const excludedBreedsAndSubBreeds = currentlyLoadedDocuments.map((doc) => ({
+    breed: doc.breed,
+    subBreed: doc.subBreed,
+  }));
+
+  try {
+    const twentyDocs: UrlRatingData[] = await Dog.aggregate([
+      {
+        $match: {
+          breed: { $nin: excludedBreedsAndSubBreeds.map((doc) => doc.breed) },
+          subBreed: {
+            $nin: excludedBreedsAndSubBreeds.map((doc) => doc.subBreed),
+          },
+        },
+      },
+      {
+        $project: {
+          breed: 1,
+          urlSubBreed: {
+            $zip: { inputs: ["$subBreed", "$urlData"], useLongestLength: true }, //plugs null into the shorter array
+          },
+        },
+      },
+
+      { $unwind: "$urlSubBreed" },
+
+      {
+        $lookup: {
+          from: "urlratings",
+          localField: "urlSubBreed.1",
+          foreignField: "_id",
+          as: "urlRatingData",
+        },
+      },
+      {
+        $unwind: "$urlRatingData",
+      },
+
+      { $sample: { size: 20 } },
+
+      {
+        $project: {
+          _id: 0,
+          breed: 1,
+          subBreed: { $arrayElemAt: ["$urlSubBreed", 0] },
+          url: "$urlRatingData.url",
+          numberOfRates: "$urlRatingData.numberOfRates",
+          userRatingData: "$urlRatingData.userRatingData",
+
+          averageRating: {
+            $avg: { $avg: "$urlRatingData.userRatingData.rating" },
+          },
+        },
+      },
+    ]);
+
+    return twentyDocs;
   } catch (error: any) {
     throw new Error(error);
   }

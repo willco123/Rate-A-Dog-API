@@ -84,6 +84,7 @@ export async function deleteToken(userObjectId: string | IdObj) {
       { $unset: { token: "" } },
     );
   } catch (err: any) {
+    console.log("hereHang");
     throw err;
   }
 }

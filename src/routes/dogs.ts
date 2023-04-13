@@ -2,28 +2,25 @@ import express from "express";
 const router = express.Router();
 
 import {
-  getAllDogsDB,
   saveDogToDB,
   getDogByField,
-  saveUrl,
+  saveUrlWithUser,
   updateUrlRating,
   saveSubBreedToDB,
   saveUrlIdToDog,
-  averageRatings,
-  sumVotes,
-  aggregateBySubBreed,
   aggregateUserRatings,
   aggregateAllGroupBySubBreed,
   aggregateAll,
+  aggregateThirtyRandomDocs,
+  aggregateTenRandomWithExclusions,
+  aggregateFiftyRandomDocs,
+  aggregateTwentyRandomWithExclusions,
 } from "../models/dog";
-import {
-  saveUrlIdToUser,
-  getUserUrlRatings,
-  getUserUrls,
-} from "../models/user";
+import { saveUrlIdToUser, getUserUrls } from "../models/user";
 import { getRandomDog, isBreed, getDogByBreed } from "../services/dog-api";
 
 import { Dog } from "./types";
+import type { UrlRatingData } from "../models/types";
 import { checkAccessToken } from "../middleware/auth";
 
 router.get(
@@ -88,11 +85,72 @@ router.get(
     next: express.NextFunction,
   ) => {
     try {
-      const response = await aggregateAll();
-      response.forEach((element) => {
-        console.log(element);
-      });
-      return res.status(200).send(response);
+      const thirtyRandomDocs: UrlRatingData[] =
+        await aggregateFiftyRandomDocs(); //assumes atleast 30 docs here, 100+ breeds so should be safe
+      return res.status(200).send(thirtyRandomDocs);
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+router.post(
+  "/ten/lower",
+  async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    try {
+      const currentlyLoadedDocuments: UrlRatingData[] = req.body.urlRatingData;
+      const twentyMoreDocs = await aggregateTwentyRandomWithExclusions(
+        currentlyLoadedDocuments,
+      );
+      const output = [
+        ...twentyMoreDocs,
+        ...currentlyLoadedDocuments.slice(0, 30),
+      ];
+
+      return res.status(200).send(output);
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+router.post(
+  "/ten/upper",
+  async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    try {
+      const currentlyLoadedDocuments: UrlRatingData[] = req.body.urlRatingData;
+      const twentyMoreDocs = await aggregateTwentyRandomWithExclusions(
+        currentlyLoadedDocuments,
+      );
+
+      const output = [...currentlyLoadedDocuments.slice(20), ...twentyMoreDocs];
+      return res.status(200).send(output);
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+router.get(
+  "/user2",
+  async (
+    _req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    try {
+      const thirtyRandomDocs: UrlRatingData[] =
+        await aggregateThirtyRandomDocs();
+
+      return res.status(200).send(thirtyRandomDocs);
     } catch (err) {
       next(err);
     }
@@ -132,7 +190,7 @@ router.post(
       const userId: string = req.body.user;
       const { breed, subBreed, url, rating } = dog;
 
-      const urlFromDB = await saveUrl(url, userId);
+      const urlFromDB = await saveUrlWithUser(url, userId);
 
       if (rating) await updateUrlRating(url, userId, rating);
 
@@ -165,3 +223,30 @@ router.post(
 );
 
 export default router;
+
+// for (let i = 0; i < 10; i++) {
+//   console.log("i is:", i);
+//   const documents = currentlyLoadedDocuments[i];
+//   console.log("documents: ", documents.breed);
+//   const urlRatingLength = documents.urlRatings.length;
+//   for (let j = 0; j < urlRatingLength; j++) {
+//     console.log("j is:", j);
+//     console.log("urlratings: ", documents.urlRatings[j]);
+//     urlCounter++;
+//     console.log("afterurlcounter++", urlCounter);
+//     if (urlCounter === 10) {
+//       documentIndex = i;
+//       urlRatingIndex = j;
+//       break;
+//     }
+//   }
+//   if (urlCounter === 10) break;
+// }
+// console.log(documentIndex, urlRatingIndex);
+// console.log("currentlyLoadedDocuments", currentlyLoadedDocuments);
+// currentlyLoadedDocuments.splice(0, documentIndex);
+// const firstDocument = currentlyLoadedDocuments[0].urlRatings;
+// if (firstDocument.length === urlRatingIndex + 1)
+//   currentlyLoadedDocuments.splice(0, 1);
+// else firstDocument.splice(0, urlRatingIndex + 1);
+// console.log(currentlyLoadedDocuments);

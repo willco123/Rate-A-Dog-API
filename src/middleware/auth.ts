@@ -54,6 +54,7 @@ export const login: RequestHandler = async (req: CustomRequest, res, next) => {
 //needs refactoring
 export const checkAccessToken: RequestHandler = async (req, res, next) => {
   try {
+    console.log("here2");
     const accessToken = req.headers["authorization"];
     if (!accessToken) return checkRefreshToken(req, res, next);
     const decodedToken = jwt.verify(accessToken, secret) as JwtTokenPayload;
@@ -76,10 +77,14 @@ export const checkRefreshToken: RequestHandler = async (
   next,
 ) => {
   try {
+    console.log("here3");
     const refreshToken = req.cookies["refresh-token"];
 
-    if (!refreshToken)
-      return res.status(401).send("Unauthorized, please log in");
+    if (!refreshToken) {
+      console.log("here4");
+      return res.status(402).send("Unauthorized, please log in");
+    }
+
     const decodedToken = jwt.verify(refreshToken, secret) as JwtTokenPayload;
     const userObjectId: string = decodedToken.userPayload as string;
     const { expiration } = decodedToken;
