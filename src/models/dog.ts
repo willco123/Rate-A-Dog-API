@@ -1,7 +1,7 @@
 import mongoose, { Types } from "mongoose";
 import { Dog, SearchFields, IdObj } from "./types";
 import { isNotNull } from "../utils/type-guards";
-import type { UrlRatingData } from "./types";
+import type { UrlRatingData, FilteredDataNoNulls } from "./types";
 const Schema = mongoose.Schema;
 
 const UserRatingSchema = new Schema({
@@ -603,7 +603,7 @@ export async function aggregateThirtyRandomDocs() {
   }
 }
 
-export async function aggregateFiftyRandomDocs() {
+export async function aggregateRandomDocs(sampleSize: number) {
   try {
     const fiftyDocs: UrlRatingData[] = await Dog.aggregate([
       {
@@ -629,7 +629,7 @@ export async function aggregateFiftyRandomDocs() {
         $unwind: "$urlRatingData",
       },
 
-      { $sample: { size: 50 } },
+      { $sample: { size: sampleSize } },
 
       {
         $project: {
@@ -657,16 +657,28 @@ export async function aggregateTenRandomWithExclusions(
   currentlyLoadedDocuments: UrlRatingData[],
 ) {
   try {
-    const excludedBreedsAndSubBreeds = currentlyLoadedDocuments.map((doc) => ({
-      breed: doc.breed,
-      subBreed: doc.subBreed,
-    }));
+    const excludedBreedsAndSubBreeds = currentlyLoadedDocuments.map((doc) => {
+      if (!doc) return doc;
+      return {
+        breed: doc.breed,
+        subBreed: doc.subBreed,
+      };
+    });
+
+    const filteredExcludedBreedsAndSubBreeds: FilteredDataNoNulls[] = [];
+    excludedBreedsAndSubBreeds.forEach((doc) => {
+      if (doc) filteredExcludedBreedsAndSubBreeds.push(doc);
+    });
+
+    console.log(excludedBreedsAndSubBreeds);
     const tenDocs: UrlRatingData[] = await Dog.aggregate([
       {
         $match: {
-          breed: { $nin: excludedBreedsAndSubBreeds.map((doc) => doc.breed) },
+          breed: {
+            $nin: filteredExcludedBreedsAndSubBreeds.map((doc) => doc.breed),
+          },
           subBreed: {
-            $nin: excludedBreedsAndSubBreeds.map((doc) => doc.subBreed),
+            $nin: filteredExcludedBreedsAndSubBreeds.map((doc) => doc.subBreed),
           },
         },
       },
@@ -723,21 +735,32 @@ export async function aggregateTenRandomWithExclusions(
   }
 }
 
-export async function aggregateTwentyRandomWithExclusions(
+export async function aggregateRandomWithExclusions(
   currentlyLoadedDocuments: UrlRatingData[],
+  sampleSize: number,
 ) {
-  const excludedBreedsAndSubBreeds = currentlyLoadedDocuments.map((doc) => ({
-    breed: doc.breed,
-    subBreed: doc.subBreed,
-  }));
+  const excludedBreedsAndSubBreeds = currentlyLoadedDocuments.map((doc) => {
+    if (!doc) return doc;
+    return {
+      breed: doc.breed,
+      subBreed: doc.subBreed,
+    };
+  });
+
+  const filteredExcludedBreedsAndSubBreeds: FilteredDataNoNulls[] = [];
+  excludedBreedsAndSubBreeds.forEach((doc) => {
+    if (doc) filteredExcludedBreedsAndSubBreeds.push(doc);
+  });
 
   try {
     const twentyDocs: UrlRatingData[] = await Dog.aggregate([
       {
         $match: {
-          breed: { $nin: excludedBreedsAndSubBreeds.map((doc) => doc.breed) },
+          breed: {
+            $nin: filteredExcludedBreedsAndSubBreeds.map((doc) => doc.breed),
+          },
           subBreed: {
-            $nin: excludedBreedsAndSubBreeds.map((doc) => doc.subBreed),
+            $nin: filteredExcludedBreedsAndSubBreeds.map((doc) => doc.subBreed),
           },
         },
       },
@@ -764,7 +787,7 @@ export async function aggregateTwentyRandomWithExclusions(
         $unwind: "$urlRatingData",
       },
 
-      { $sample: { size: 20 } },
+      { $sample: { size: sampleSize } },
 
       {
         $project: {

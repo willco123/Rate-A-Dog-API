@@ -13,8 +13,8 @@ import {
   aggregateAll,
   aggregateThirtyRandomDocs,
   aggregateTenRandomWithExclusions,
-  aggregateFiftyRandomDocs,
-  aggregateTwentyRandomWithExclusions,
+  aggregateRandomDocs,
+  aggregateRandomWithExclusions,
 } from "../models/dog";
 import { saveUrlIdToUser, getUserUrls } from "../models/user";
 import { getRandomDog, isBreed, getDogByBreed } from "../services/dog-api";
@@ -85,33 +85,9 @@ router.get(
     next: express.NextFunction,
   ) => {
     try {
-      const thirtyRandomDocs: UrlRatingData[] =
-        await aggregateFiftyRandomDocs(); //assumes atleast 30 docs here, 100+ breeds so should be safe
-      return res.status(200).send(thirtyRandomDocs);
-    } catch (err) {
-      next(err);
-    }
-  },
-);
-
-router.post(
-  "/ten/lower",
-  async (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction,
-  ) => {
-    try {
-      const currentlyLoadedDocuments: UrlRatingData[] = req.body.urlRatingData;
-      const twentyMoreDocs = await aggregateTwentyRandomWithExclusions(
-        currentlyLoadedDocuments,
-      );
-      const output = [
-        ...twentyMoreDocs,
-        ...currentlyLoadedDocuments.slice(0, 30),
-      ];
-
-      return res.status(200).send(output);
+      const randomDocs: UrlRatingData[] = await aggregateRandomDocs(100); //assumes atleast 50 docs here, 100+ breeds so should be safe
+      // const randomDocs = Array(100).fill(null);
+      return res.status(200).send(randomDocs);
     } catch (err) {
       next(err);
     }
@@ -127,11 +103,91 @@ router.post(
   ) => {
     try {
       const currentlyLoadedDocuments: UrlRatingData[] = req.body.urlRatingData;
-      const twentyMoreDocs = await aggregateTwentyRandomWithExclusions(
+      const moreDocs = await aggregateRandomWithExclusions(
         currentlyLoadedDocuments,
+        40,
       );
+      const nullArray = Array(40).fill(null);
+      let lastNonNullValue: number = 0; // Initialize to null
 
-      const output = [...currentlyLoadedDocuments.slice(20), ...twentyMoreDocs];
+      for (let i = currentlyLoadedDocuments.length - 1; i >= 0; i--) {
+        if (currentlyLoadedDocuments[i] !== null) {
+          lastNonNullValue = i;
+          break; // Exit the loop after finding the first non-null value
+        }
+      }
+      console.log(lastNonNullValue);
+      const output = [
+        ...nullArray, //add 40 nulls to the beginning
+        ...currentlyLoadedDocuments.slice(
+          lastNonNullValue - 60,
+          lastNonNullValue,
+        ), //add 60 docs before the last non null
+        ...moreDocs, //ad 40 random docs
+        ...currentlyLoadedDocuments.slice(lastNonNullValue + 40, -1), //add the rest of the docs - 40 nulls
+      ];
+      // output.forEach((element) => {
+      //   if (element == null) console.log(element);
+      //   else console.log(element.breed);
+      // });
+      return res.status(200).send(output);
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+router.post(
+  "/ten/lower",
+  async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    try {
+      const currentlyLoadedDocuments: UrlRatingData[] = req.body.urlRatingData;
+      const moreDocs = await aggregateRandomWithExclusions(
+        currentlyLoadedDocuments,
+        40,
+      );
+      const nullArray = Array(40).fill(null);
+
+      const firstLowerDataIndex = currentlyLoadedDocuments.findIndex((el) => {
+        return el != null;
+      });
+
+      const lowerNullArray = [
+        ...currentlyLoadedDocuments.slice(0, firstLowerDataIndex),
+      ];
+      if (lowerNullArray.length > 0) lowerNullArray.splice(0, 40); //remove 40 nulls
+
+      let lastNonNullValue: number = 0;
+
+      for (let i = currentlyLoadedDocuments.length - 1; i >= 0; i--) {
+        if (currentlyLoadedDocuments[i] !== null) {
+          lastNonNullValue = i;
+          break;
+        }
+      }
+
+      const upperNullArray = [
+        ...currentlyLoadedDocuments.slice(lastNonNullValue, -1),
+        ...nullArray,
+      ];
+
+      const output = [
+        ...lowerNullArray,
+        ...moreDocs,
+        ...currentlyLoadedDocuments.slice(
+          firstLowerDataIndex,
+          firstLowerDataIndex + 60,
+        ),
+        ...upperNullArray,
+      ];
+      // output.forEach((element) => {
+      //   if (element == null) console.log(element);
+      //   else console.log(element.breed);
+      // });
       return res.status(200).send(output);
     } catch (err) {
       next(err);

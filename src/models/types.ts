@@ -88,6 +88,11 @@ export type UrlRatingData = {
   numberOfRates: number;
   userRatingData: UrlUserRatingData[];
   averageRating: number | null;
+} | null;
+
+export type FilteredDataNoNulls = {
+  breed: string;
+  subBreed: string | null;
 };
 
 type UrlUserRatingData = {
