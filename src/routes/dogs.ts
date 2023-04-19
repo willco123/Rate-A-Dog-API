@@ -8,37 +8,16 @@ import {
   updateUrlRating,
   saveSubBreedToDB,
   saveUrlIdToDog,
-  aggregateUserRatings,
-  aggregateAllGroupBySubBreed,
-  aggregateAll,
-  aggregateThirtyRandomDocs,
-  aggregateTenRandomWithExclusions,
+  aggregateUserRatingsRandom,
   aggregateRandomDocs,
   aggregateRandomWithExclusions,
 } from "../models/dog";
 import { saveUrlIdToUser, getUserUrls } from "../models/user";
-import { getRandomDog, isBreed, getDogByBreed } from "../services/dog-api";
+import { isBreed, getDogByBreed } from "../services/dog-api";
 
 import { Dog } from "./types";
 import type { UrlRatingData } from "../models/types";
 import { checkAccessToken } from "../middleware/auth";
-
-router.get(
-  "/random",
-  [checkAccessToken],
-  async (
-    _req: express.Request,
-    res: express.Response,
-    next: express.NextFunction,
-  ) => {
-    try {
-      const randomDog = await getRandomDog();
-      return res.send(randomDog);
-    } catch (err) {
-      next(err);
-    }
-  },
-);
 
 router.post(
   "/breed",
@@ -62,31 +41,16 @@ router.post(
   },
 );
 
-router.get(
-  "/",
-  async (
-    _req: express.Request,
-    res: express.Response,
-    next: express.NextFunction,
-  ) => {
-    try {
-      const response = await aggregateAllGroupBySubBreed();
-      return res.status(200).send(response);
-    } catch (err) {
-      next(err);
-    }
-  },
-);
-router.get(
+router.post(
   "/all",
   async (
-    _req: express.Request,
+    req: express.Request,
     res: express.Response,
     next: express.NextFunction,
   ) => {
     try {
-      const randomDocs: UrlRatingData[] = await aggregateRandomDocs(100); //assumes atleast 50 docs here, 100+ breeds so should be safe
-      // const randomDocs = Array(100).fill(null);
+      const sampleSize: number = req.body.sampleSize;
+      const randomDocs: UrlRatingData[] = await aggregateRandomDocs(sampleSize); //order doesn't matter for random
       return res.status(200).send(randomDocs);
     } catch (err) {
       next(err);
@@ -95,42 +59,22 @@ router.get(
 );
 
 router.post(
-  "/ten/upper",
+  "/all/more",
   async (
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
   ) => {
     try {
-      const currentlyLoadedDocuments: UrlRatingData[] = req.body.urlRatingData;
+      const currentlyLoadedDocuments: UrlRatingData[] =
+        req.body.currentlyLoadedDocuments;
+      const sampleSize: number = req.body.sampleSize;
       const moreDocs = await aggregateRandomWithExclusions(
         currentlyLoadedDocuments,
-        40,
+        sampleSize,
       );
-      const nullArray = Array(40).fill(null);
-      let lastNonNullValue: number = 0; // Initialize to null
 
-      for (let i = currentlyLoadedDocuments.length - 1; i >= 0; i--) {
-        if (currentlyLoadedDocuments[i] !== null) {
-          lastNonNullValue = i;
-          break; // Exit the loop after finding the first non-null value
-        }
-      }
-      console.log(lastNonNullValue);
-      const output = [
-        ...nullArray, //add 40 nulls to the beginning
-        ...currentlyLoadedDocuments.slice(
-          lastNonNullValue - 60,
-          lastNonNullValue,
-        ), //add 60 docs before the last non null
-        ...moreDocs, //ad 40 random docs
-        ...currentlyLoadedDocuments.slice(lastNonNullValue + 40, -1), //add the rest of the docs - 40 nulls
-      ];
-      // output.forEach((element) => {
-      //   if (element == null) console.log(element);
-      //   else console.log(element.breed);
-      // });
-      return res.status(200).send(output);
+      return res.status(200).send(moreDocs);
     } catch (err) {
       next(err);
     }
@@ -138,75 +82,17 @@ router.post(
 );
 
 router.post(
-  "/ten/lower",
+  "/all/sort",
   async (
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
   ) => {
     try {
-      const currentlyLoadedDocuments: UrlRatingData[] = req.body.urlRatingData;
-      const moreDocs = await aggregateRandomWithExclusions(
-        currentlyLoadedDocuments,
-        40,
-      );
-      const nullArray = Array(40).fill(null);
-
-      const firstLowerDataIndex = currentlyLoadedDocuments.findIndex((el) => {
-        return el != null;
-      });
-
-      const lowerNullArray = [
-        ...currentlyLoadedDocuments.slice(0, firstLowerDataIndex),
-      ];
-      if (lowerNullArray.length > 0) lowerNullArray.splice(0, 40); //remove 40 nulls
-
-      let lastNonNullValue: number = 0;
-
-      for (let i = currentlyLoadedDocuments.length - 1; i >= 0; i--) {
-        if (currentlyLoadedDocuments[i] !== null) {
-          lastNonNullValue = i;
-          break;
-        }
-      }
-
-      const upperNullArray = [
-        ...currentlyLoadedDocuments.slice(lastNonNullValue, -1),
-        ...nullArray,
-      ];
-
-      const output = [
-        ...lowerNullArray,
-        ...moreDocs,
-        ...currentlyLoadedDocuments.slice(
-          firstLowerDataIndex,
-          firstLowerDataIndex + 60,
-        ),
-        ...upperNullArray,
-      ];
-      // output.forEach((element) => {
-      //   if (element == null) console.log(element);
-      //   else console.log(element.breed);
-      // });
-      return res.status(200).send(output);
-    } catch (err) {
-      next(err);
-    }
-  },
-);
-
-router.get(
-  "/user2",
-  async (
-    _req: express.Request,
-    res: express.Response,
-    next: express.NextFunction,
-  ) => {
-    try {
-      const thirtyRandomDocs: UrlRatingData[] =
-        await aggregateThirtyRandomDocs();
-
-      return res.status(200).send(thirtyRandomDocs);
+      const sampleSize: number = req.body.sampleSize;
+      //Allow filtering by breed, subBreed, sort by average rating
+      const randomDocs: UrlRatingData[] = await aggregateRandomDocs(sampleSize); //order doesn't matter for random
+      return res.status(200).send(randomDocs);
     } catch (err) {
       next(err);
     }
@@ -222,9 +108,31 @@ router.get(
     _next: express.NextFunction,
   ) => {
     try {
+      //allow filtering by breed, subBreed, sort by average rating and my rating
       const userId = req.body.user;
       const userUrls = await getUserUrls(userId);
-      const aggregateUser = await aggregateUserRatings(userUrls, userId);
+      const aggregateUser = await aggregateUserRatingsRandom(userUrls, userId);
+      //need function, if arraysize < 100 do n
+      return res.status(200).send(aggregateUser);
+    } catch (error) {
+      throw new Error();
+    }
+  },
+);
+
+router.get(
+  "/user/more",
+  [checkAccessToken],
+  async (
+    req: express.Request,
+    res: express.Response,
+    _next: express.NextFunction,
+  ) => {
+    try {
+      const userId = req.body.user;
+      const userUrls = await getUserUrls(userId);
+      const aggregateUser = await aggregateUserRatingsRandom(userUrls, userId);
+
       return res.status(200).send(aggregateUser);
     } catch (error) {
       throw new Error();
@@ -279,30 +187,3 @@ router.post(
 );
 
 export default router;
-
-// for (let i = 0; i < 10; i++) {
-//   console.log("i is:", i);
-//   const documents = currentlyLoadedDocuments[i];
-//   console.log("documents: ", documents.breed);
-//   const urlRatingLength = documents.urlRatings.length;
-//   for (let j = 0; j < urlRatingLength; j++) {
-//     console.log("j is:", j);
-//     console.log("urlratings: ", documents.urlRatings[j]);
-//     urlCounter++;
-//     console.log("afterurlcounter++", urlCounter);
-//     if (urlCounter === 10) {
-//       documentIndex = i;
-//       urlRatingIndex = j;
-//       break;
-//     }
-//   }
-//   if (urlCounter === 10) break;
-// }
-// console.log(documentIndex, urlRatingIndex);
-// console.log("currentlyLoadedDocuments", currentlyLoadedDocuments);
-// currentlyLoadedDocuments.splice(0, documentIndex);
-// const firstDocument = currentlyLoadedDocuments[0].urlRatings;
-// if (firstDocument.length === urlRatingIndex + 1)
-//   currentlyLoadedDocuments.splice(0, 1);
-// else firstDocument.splice(0, urlRatingIndex + 1);
-// console.log(currentlyLoadedDocuments);

@@ -1,18 +1,10 @@
 import axios from "axios";
 import {
-  saveUrl,
   saveManyUrls,
-  getDogByField,
-  saveDogToDB,
   saveDogToDB2,
   saveSubBreedToDB,
   saveManyUrlIdsToDog,
-  aggregateAll,
-  aggregateThirtyRandomDocs,
 } from "../models/dog";
-import mongoose from "mongoose";
-import { findIndex } from "lodash";
-import type { UrlRatingData } from "../models/types";
 
 interface dogData extends JSON {
   [key: string]: object;

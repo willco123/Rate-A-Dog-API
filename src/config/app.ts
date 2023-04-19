@@ -4,7 +4,6 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 import "../middleware/passport";
 import indexRouter from "../routes/index";
-import favouritesRouter from "../routes/favourites";
 import usersRouter from "../routes/users";
 import loginRouter from "../routes/login";
 import dogsRouter from "../routes/dogs";
@@ -26,7 +25,6 @@ app.set("view engine", "ejs");
 app.use(express.static("public")); //can access public files in browser
 
 app.use("/", indexRouter);
-app.use("/favourites", favouritesRouter);
 app.use("/dogs", dogsRouter);
 app.use("/", usersRouter);
 app.use("/", loginRouter);

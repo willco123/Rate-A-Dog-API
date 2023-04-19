@@ -8,6 +8,10 @@ const debug = Debug("backend:server");
 const port = process.env.PORT || 3005;
 app.set("port", port);
 
+// (async () => {
+//   await storeAllBreeds();
+// })();
+
 var server = http.createServer(app);
 server.listen(port);
 server.on("error", onError);

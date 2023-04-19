@@ -2,7 +2,6 @@ import express from "express";
 const router = express.Router();
 import { saveUserToDB } from "../models/user";
 import { authNewUser, checkUniqueness } from "../middleware/auth";
-import { createFavouriteDoc } from "../models/favourite";
 import bcrypt from "bcrypt";
 import { UserDetails } from "./types";
 
@@ -20,7 +19,7 @@ router.post(
       const password = await bcrypt.hash(newUser.password, salt);
       newUser.password = password;
       const user = await saveUserToDB(newUser);
-      await createFavouriteDoc(user._id);
+
       return res.status(200).send("New User added");
     } catch (err: any) {
       next(err);

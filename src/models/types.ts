@@ -56,37 +56,13 @@ export type DBFavourites = {
 export type IdObj = {
   _id: Types.ObjectId;
 };
-// export type UpdateFields = {
-//   username?: string;
-//   password?: string;
-//   email?: string;
-//   rank?: string;
-// };
-
-// export type UsernameObj = {
-//   username: string;
-// };
-
-// export type EmailObj = {
-//   email: string;
-// };
-
-// export type UrlObj = {
-//   url: string;
-// };
-
-// export type UserObjId = {
-//   user: Types.ObjectId;
-// };
-
-// export type UserSearchQuery = UsernameObj | EmailObj | IdObj;
 
 export type UrlRatingData = {
   breed: string;
   subBreed: string | null;
   url: string;
   numberOfRates: number;
-  userRatingData: UrlUserRatingData[];
+  usersRatingData: UsersRatingData[];
   averageRating: number | null;
 } | null;
 
@@ -95,7 +71,24 @@ export type FilteredDataNoNulls = {
   subBreed: string | null;
 };
 
-type UrlUserRatingData = {
-  url: string;
+type UsersRatingData = {
+  userId: string;
   rating: number | null;
+};
+
+export type UserRatingdata = {
+  breed: string;
+  subBreed: string | null;
+  urlRatings: UserUrlRatingData[];
+};
+
+type UserUrlRatingData = { url: string; rating: number | null };
+
+export type testuserData = {
+  breed: string;
+  subBreed: string | null;
+  url: string;
+  numberOfRates: number;
+  averageRating: number | null;
+  myRating: number | null;
 };
