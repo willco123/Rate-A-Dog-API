@@ -1,7 +1,7 @@
 import axios from "axios";
 import {
   saveManyUrls,
-  saveDogToDB2,
+  saveDogToDB,
   saveSubBreedToDB,
   saveManyUrlIdsToDog,
 } from "../models/dog";
@@ -91,7 +91,7 @@ export async function storeAllBreeds() {
       );
       const urlIds = await saveManyUrls(urlArayobj);
 
-      let dogFromDB = await saveDogToDB2(breed);
+      let dogFromDB = await saveDogToDB(breed);
 
       let { _id: dbId, subBreed: dbSubBreed } = dogFromDB;
 

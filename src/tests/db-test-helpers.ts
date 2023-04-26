@@ -1,4 +1,4 @@
-import { UserSearchQuery } from "../models/types";
+import { UserSearchQuery } from "../types";
 import db from "../config/db";
 
 export async function insertTestData(collection: string, testData: object[]) {

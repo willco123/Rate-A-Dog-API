@@ -9,7 +9,7 @@ import {
   generateRefreshToken,
   generateAccessToken,
 } from "../utils/token-config";
-import type { UserDetails, Login } from "./types";
+import type { UserDetailsUi, Login } from "../types";
 const secret = process.env.JWT_SECRET!;
 
 export interface CustomRequest extends Request {
@@ -18,7 +18,7 @@ export interface CustomRequest extends Request {
 }
 
 export const authNewUser: RequestHandler = (req, res, next) => {
-  const newUser: UserDetails = req.body;
+  const newUser: UserDetailsUi = req.body;
   const { error } = validateNewUser(newUser);
   if (error) return res.status(401).send(error.details[0].message);
   next();

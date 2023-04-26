@@ -2,12 +2,8 @@ import express from "express";
 const router = express.Router();
 
 import {
-  saveDogToDB,
-  getDogByField,
   saveUrlWithUser,
   updateUrlRating,
-  saveSubBreedToDB,
-  saveUrlIdToDog,
   aggregateUserSorted,
   aggregateRandomDocs,
   aggregateRandomWithExclusions,
@@ -18,10 +14,9 @@ import {
   filteredCountUser,
 } from "../models/dog";
 import { saveUrlIdToUser, getUserUrls } from "../models/user";
-import { isBreed, getDogByBreed } from "../services/dog-api";
 
-import { Dog } from "./types";
-import type { UrlRatingData } from "../models/types";
+import { Dog } from "../types";
+import type { UrlRatingData } from "../types";
 import { checkAccessToken, decodeToken } from "../middleware/auth";
 
 router.post(
@@ -54,10 +49,7 @@ router.post(
 
       let userId = undefined;
       if (authHeader) userId = decodeToken(authHeader);
-      const randomDocs: UrlRatingData[] = await aggregateRandomDocs(
-        sampleSize,
-        userId,
-      ); //order doesn't matter for random
+      const randomDocs = await aggregateRandomDocs(sampleSize, userId); //order doesn't matter for random
 
       return res.status(200).send(randomDocs);
     } catch (err) {
@@ -141,7 +133,7 @@ router.post(
       if (req.body.sortOrder === "desc") sortOrder = -1;
       const { sortMode, sampleSize, filteredBreed, userId, currentMaxIndex } =
         req.body;
-      const userUrlArray: string[] = await getUserUrls(userId);
+      const userUrlArray = await getUserUrls(userId);
       const aggregateUser = await aggregateUserSorted(
         userUrlArray,
         userId,
@@ -168,7 +160,7 @@ router.get(
   ) => {
     try {
       const userId = req.body.userId;
-      const userUrlArray: string[] = await getUserUrls(userId);
+      const userUrlArray = await getUserUrls(userId);
       const count = await countUserAggregate(userUrlArray);
       return res.status(200).send(count);
     } catch (error) {
@@ -225,35 +217,61 @@ router.post(
       const dog: Dog = req.body.dog;
       if (!req.body.userId) throw new Error();
       const userId: string = req.body.userId;
-      const { breed, subBreed, url, rating } = dog;
+      const { url, rating } = dog;
 
       const urlFromDB = await saveUrlWithUser(url, userId);
 
-      let urlRating;
-      if (rating) urlRating = await updateUrlRating(url, userId, rating);
-
+      if (rating) await updateUrlRating(url, userId, rating);
       const urlId = urlFromDB._id;
       await saveUrlIdToUser(urlId, userId);
+      return res.status(200).send({ message: "success" });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
-      let dogFromDB = await getDogByField({ breed: breed });
-      if (!dogFromDB) dogFromDB = await saveDogToDB(breed);
+router.post(
+  "/adminStuff",
+  [checkAccessToken],
+  async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    try {
+      //for adding single new documents
+      // const dog: Dog = req.body.dog;
+      // if (!req.body.userId) throw new Error();
+      // const userId: string = req.body.userId;
+      // const { breed, subBreed, url, rating } = dog;
 
-      let { _id: dbId, subBreed: dbSubBreed } = dogFromDB;
+      // const urlFromDB = await saveUrlWithUser(url, userId);
 
-      if (subBreed && !dbSubBreed.includes(subBreed)) {
-        dogFromDB = await saveSubBreedToDB(dbId, subBreed);
-        dbSubBreed = dogFromDB.subBreed;
-      }
+      // if (rating) await updateUrlRating(url, userId, rating);
 
-      let subBreedIndex = dbSubBreed.findIndex((element) => {
-        return element === subBreed;
-      });
+      // const urlId = urlFromDB._id;
+      // await saveUrlIdToUser(urlId, userId);
 
-      if (subBreedIndex === -1) subBreedIndex = 0;
+      // let dogFromDB = await getDogByField({ breed: breed });
+      // if (!dogFromDB) dogFromDB = await saveDogToDB(breed);
 
-      await saveUrlIdToDog(urlId, dbId, subBreedIndex);
+      // let { _id: dbId, subBreed: dbSubBreed } = dogFromDB;
 
-      return res.status(200).send(urlRating);
+      // if (subBreed && !dbSubBreed.includes(subBreed)) {
+      //   dogFromDB = await saveSubBreedToDB(dbId, subBreed);
+      //   dbSubBreed = dogFromDB.subBreed;
+      // }
+
+      // let subBreedIndex = dbSubBreed.findIndex((element) => {
+      //   return element === subBreed;
+      // });
+
+      // if (subBreedIndex === -1) subBreedIndex = 0;
+
+      // await saveUrlIdToDog(urlId, dbId, subBreedIndex);
+
+      return res.status(200).send({ message: "success" });
     } catch (err) {
       next(err);
     }

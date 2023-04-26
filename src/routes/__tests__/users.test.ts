@@ -3,7 +3,6 @@ import { setUpMockApp } from "../../tests/test-helpers";
 import router from "../users";
 import bcrypt from "bcrypt";
 import * as userQueries from "../../models/user";
-import * as favouriteQueries from "../../models/favourite";
 
 jest.mock("bcrypt");
 const bcryptSaltSpy = jest.spyOn(bcrypt, "genSalt").mockImplementation(() => {
