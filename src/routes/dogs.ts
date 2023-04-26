@@ -15,8 +15,6 @@ import {
 } from "../models/dog";
 import { saveUrlIdToUser, getUserUrls } from "../models/user";
 
-import { Dog } from "../types";
-import type { UrlRatingData } from "../types";
 import { checkAccessToken, decodeToken } from "../middleware/auth";
 
 router.post(
@@ -214,13 +212,8 @@ router.post(
     next: express.NextFunction,
   ) => {
     try {
-      const dog: Dog = req.body.dog;
-      if (!req.body.userId) throw new Error();
-      const userId: string = req.body.userId;
-      const { url, rating } = dog;
-
+      const { url, rating, userId } = req.body;
       const urlFromDB = await saveUrlWithUser(url, userId);
-
       if (rating) await updateUrlRating(url, userId, rating);
       const urlId = urlFromDB._id;
       await saveUrlIdToUser(urlId, userId);

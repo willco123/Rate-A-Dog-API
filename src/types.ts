@@ -11,13 +11,6 @@ export type Login = {
   password: string;
 };
 
-export type Dog = {
-  url: string;
-  breed: string;
-  subBreed?: string;
-  rating?: number;
-};
-
 export type UserSearchQuery = {
   [key: string]: string | Types.ObjectId;
 };

@@ -1,5 +1,4 @@
 import mongoose, { Types } from "mongoose";
-import { Dog, IdObj } from "../types";
 import type {
   UrlRatingData,
   SingleUrlOnRate,
@@ -171,8 +170,8 @@ export async function saveManyUrls(urls: { url: string }[]) {
 }
 
 export async function saveManyUrlIdsToDog(
-  urlIds: IdObj[],
-  dogId: IdObj,
+  urlIds: Types.ObjectId[],
+  dogId: Types.ObjectId,
   index: number,
 ) {
   try {
@@ -220,8 +219,9 @@ export async function aggregateRandomDocs(sampleSize: number, userId?: string) {
       lookupUrlRatingDataFromZip,
       unwindUrlRatingData,
       limitBySampleSize(sampleSize),
-      id ? projectStandardFormat(id) : projectStandardFormatNoUser,
-      id ? projectTidyUpMyRatings : { $project: {} },
+      id
+        ? (projectStandardFormat(id), projectTidyUpMyRatings)
+        : projectStandardFormatNoUser,
     ]);
 
     return fiftyDocs;
@@ -246,8 +246,9 @@ export async function aggregateRandomWithExclusions(
       lookupUrlRatingDataFromZip,
       unwindUrlRatingData,
       limitBySampleSize(sampleSize),
-      id ? projectStandardFormat(id) : projectStandardFormatNoUser,
-      id ? projectTidyUpMyRatings : { $project: {} },
+      id
+        ? (projectStandardFormat(id), projectTidyUpMyRatings)
+        : projectStandardFormatNoUser,
     ]);
 
     return moreDocs;
@@ -274,8 +275,9 @@ export async function aggregateAllSorted(
       matchSubBreedFilter(filteredBreed),
       lookupUrlRatingDataFromZip,
       unwindUrlRatingData,
-      id ? projectStandardFormat(id) : projectStandardFormatNoUser,
-      id ? projectTidyUpMyRatings : { $project: {} },
+      id
+        ? (projectStandardFormat(id), projectTidyUpMyRatings)
+        : projectStandardFormatNoUser,
       sortAndBiasByUrl(sortOrder, sortMode),
       excludeNonZero(sortMode),
       skipByCount(skipCount),
