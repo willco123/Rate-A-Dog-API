@@ -84,7 +84,6 @@ export async function deleteToken(userObjectId: string | IdObj) {
       { $unset: { token: "" } },
     );
   } catch (err: any) {
-    console.log("hereHang");
     throw err;
   }
 }
@@ -186,7 +185,6 @@ export async function getUserUrlRatings(userId: string) {
     //assuming the above code gives a 1-1 mapping of urls to ratings then it should be fine
     //assumption: group goes through each urlId and pushes rating and url at the same index
     if (!userUrls) return null;
-    // console.log(userUrls[0]);
     return userUrls[0];
   } catch (err: any) {
     throw err;

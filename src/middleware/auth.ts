@@ -54,14 +54,13 @@ export const login: RequestHandler = async (req: CustomRequest, res, next) => {
 //needs refactoring
 export const checkAccessToken: RequestHandler = async (req, res, next) => {
   try {
-    console.log("here2");
     const accessToken = req.headers["authorization"];
     if (!accessToken) return checkRefreshToken(req, res, next);
     const decodedToken = jwt.verify(accessToken, secret) as JwtTokenPayload;
     const expiration = decodedToken.expiration;
 
     if (Date.now() > expiration) return checkRefreshToken(req, res, next);
-    req.body.user = decodedToken.userPayload;
+    req.body.userId = decodedToken.userPayload;
     next();
   } catch (err: any) {
     if ((err.message = "invalid signature"))
@@ -77,11 +76,9 @@ export const checkRefreshToken: RequestHandler = async (
   next,
 ) => {
   try {
-    console.log("here3");
     const refreshToken = req.cookies["refresh-token"];
 
     if (!refreshToken) {
-      console.log("here4");
       return res.status(402).send("Unauthorized, please log in");
     }
 
@@ -104,7 +101,7 @@ export const checkRefreshToken: RequestHandler = async (
 
     const accessToken = generateAccessToken(decodedToken.userPayload);
     res.setHeader("Authorization", accessToken);
-    req.body.user = decodedToken.userPayload;
+    req.body.userId = decodedToken.userPayload;
     next();
   } catch (err: any) {
     if ((err.message = "invalid signature"))
@@ -112,6 +109,14 @@ export const checkRefreshToken: RequestHandler = async (
     next(err);
   }
 };
+
+export function decodeToken(token: string) {
+  const decodedToken = jwt.verify(token, secret) as JwtTokenPayload;
+  const expiration = decodedToken.expiration;
+  if (Date.now() > expiration) return undefined;
+
+  return decodedToken.userPayload;
+}
 
 //maybe require both refresh and access tokens to be present to allow access, currently
 //only access token is required (although it is a short-lived token with no user info in payload)
