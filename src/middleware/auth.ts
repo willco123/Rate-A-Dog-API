@@ -79,7 +79,7 @@ export const checkRefreshToken: RequestHandler = async (
     const refreshToken = req.cookies["refresh-token"];
 
     if (!refreshToken) {
-      return res.status(402).send("Unauthorized, please log in");
+      return res.status(401).send("Unauthorized, please log in");
     }
 
     const decodedToken = jwt.verify(refreshToken, secret) as JwtTokenPayload;

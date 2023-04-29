@@ -26,6 +26,7 @@ import {
   sortAndBiasByUrl,
   skipByCount,
   limitBySampleSize,
+  randomSample,
 } from "../utils/aggregate-pipeline/dog-aggregates";
 const Schema = mongoose.Schema;
 
@@ -218,12 +219,11 @@ export async function aggregateRandomDocs(sampleSize: number, userId?: string) {
       unwindUrlSubBreed,
       lookupUrlRatingDataFromZip,
       unwindUrlRatingData,
-      limitBySampleSize(sampleSize),
-      id
-        ? (projectStandardFormat(id), projectTidyUpMyRatings)
-        : projectStandardFormatNoUser,
+      randomSample(sampleSize),
+      ...(id
+        ? [projectStandardFormat(id), projectTidyUpMyRatings]
+        : [projectStandardFormatNoUser]),
     ]);
-
     return fiftyDocs;
   } catch (error: any) {
     throw new Error(error);
@@ -245,12 +245,11 @@ export async function aggregateRandomWithExclusions(
       unwindUrlSubBreed,
       lookupUrlRatingDataFromZip,
       unwindUrlRatingData,
-      limitBySampleSize(sampleSize),
-      id
-        ? (projectStandardFormat(id), projectTidyUpMyRatings)
-        : projectStandardFormatNoUser,
+      randomSample(sampleSize),
+      ...(id
+        ? [projectStandardFormat(id), projectTidyUpMyRatings]
+        : [projectStandardFormatNoUser]),
     ]);
-
     return moreDocs;
   } catch (error: any) {
     throw new Error(error);
@@ -275,9 +274,9 @@ export async function aggregateAllSorted(
       matchSubBreedFilter(filteredBreed),
       lookupUrlRatingDataFromZip,
       unwindUrlRatingData,
-      id
-        ? (projectStandardFormat(id), projectTidyUpMyRatings)
-        : projectStandardFormatNoUser,
+      ...(id
+        ? [projectStandardFormat(id), projectTidyUpMyRatings]
+        : [projectStandardFormatNoUser]),
       sortAndBiasByUrl(sortOrder, sortMode),
       excludeNonZero(sortMode),
       skipByCount(skipCount),
@@ -348,6 +347,17 @@ export async function aggreagateSingleUrl(url: string, userId: string) {
     ]);
 
     return urlData[0];
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
+
+export async function countAggregate() {
+  //get all user docs
+  try {
+    const totalCount = await UrlRating.countDocuments([{}]);
+
+    return totalCount;
   } catch (error: any) {
     throw new Error(error);
   }

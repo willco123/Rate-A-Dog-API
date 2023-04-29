@@ -227,6 +227,12 @@ export const limitBySampleSize = (sampleSize: number) => {
   };
 };
 
+export const randomSample = (sampleSize: number) => {
+  return {
+    $sample: { size: sampleSize },
+  };
+};
+
 // match.subBreed = { $arrayElemAt: { $eq: ["$subBreed", firstSubBreed] } };
 // match.subBreed = {
 //   $redact: {

@@ -8,6 +8,7 @@ import {
   aggregateRandomDocs,
   aggregateRandomWithExclusions,
   countUserAggregate,
+  countAggregate,
   aggregateAllSorted,
   aggreagateSingleUrl,
   filteredCount,
@@ -89,27 +90,25 @@ router.post(
     next: express.NextFunction,
   ) => {
     try {
+      console.log("all-sorted one");
       let sortOrder: 1 | -1 = -1;
       if (req.body.sortOrder === "asc") sortOrder = 1;
       if (req.body.sortOrder === "desc") sortOrder = -1;
-      const {
-        sortMode,
-        sampleSize,
-        filteredBreed,
-        currentMaxIndex,
-        authHeader,
-      } = req.body;
+      const { sortMode, sampleSize, filteredBreed, skipCount, authHeader } =
+        req.body;
       let userId = undefined;
       if (authHeader) userId = decodeToken(authHeader);
 
       const aggregateAll = await aggregateAllSorted(
         sortOrder,
         sortMode,
-        currentMaxIndex,
+        skipCount,
         sampleSize,
         userId,
         filteredBreed,
       );
+      console.log("all-sorted two");
+
       return res.status(200).send(aggregateAll);
     } catch (error) {
       next();
@@ -129,7 +128,7 @@ router.post(
       let sortOrder: 1 | -1 = -1;
       if (req.body.sortOrder === "asc") sortOrder = 1;
       if (req.body.sortOrder === "desc") sortOrder = -1;
-      const { sortMode, sampleSize, filteredBreed, userId, currentMaxIndex } =
+      const { sortMode, sampleSize, filteredBreed, userId, skipCount } =
         req.body;
       const userUrlArray = await getUserUrls(userId);
       const aggregateUser = await aggregateUserSorted(
@@ -137,7 +136,7 @@ router.post(
         userId,
         sortOrder,
         sortMode,
-        currentMaxIndex,
+        skipCount,
         sampleSize,
         filteredBreed,
       );
@@ -160,7 +159,23 @@ router.get(
       const userId = req.body.userId;
       const userUrlArray = await getUserUrls(userId);
       const count = await countUserAggregate(userUrlArray);
-      return res.status(200).send(count);
+      return res.status(200).send({ count: count });
+    } catch (error) {
+      next();
+    }
+  },
+);
+
+router.get(
+  "/maxcount",
+  async (
+    _req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    try {
+      const count = await countAggregate();
+      return res.status(200).send({ count: count });
     } catch (error) {
       next();
     }
@@ -177,7 +192,7 @@ router.post(
     try {
       const { filteredBreed } = req.body;
       const count = await filteredCount(filteredBreed);
-      return res.status(200).send(count);
+      return res.status(200).send({ count: count });
     } catch (error) {
       next();
     }
@@ -196,7 +211,7 @@ router.post(
       const { filteredBreed, userId } = req.body;
       const userUrlArray = await getUserUrls(userId);
       const count = await filteredCountUser(filteredBreed, userUrlArray);
-      return res.status(200).send(count);
+      return res.status(200).send({ count: count });
     } catch (error) {
       next();
     }
