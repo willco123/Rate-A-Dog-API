@@ -20,6 +20,9 @@ import {
   projectUrlsForCount,
   projectSingleUrlTidyUpMyRating,
   projectSingleUrlOnRate,
+  projectSubBreedForGroup,
+  projectTidyUpGroupedSubBreeds,
+  groupBySubBreed,
   unwindUrlSubBreed,
   unwindUrlRatingData,
   lookupUrlRatingDataFromZip,
@@ -267,7 +270,7 @@ export async function aggregateAllSorted(
   try {
     let id: Types.ObjectId | undefined = undefined;
     if (userId) id = new Types.ObjectId(userId);
-    const userRatings: UrlRatingData[] = await Dog.aggregate([
+    const urlRatings: UrlRatingData[] = await Dog.aggregate([
       matchBreedFilter(filteredBreed),
       projectAndZipSubBreedUrlArrays,
       unwindUrlSubBreed,
@@ -282,9 +285,8 @@ export async function aggregateAllSorted(
       skipByCount(skipCount),
       limitBySampleSize(sampleSize),
     ]);
-    return userRatings;
+    return urlRatings;
   } catch (error: any) {
-    console.log(error);
     throw new Error(error);
   }
 }
@@ -302,6 +304,15 @@ export async function aggregateUserSorted(
   sampleSize = 50,
   filteredBreed?: { breed: string; subBreed: string | null },
 ) {
+  console.log(
+    urlIdArray,
+    userId,
+    sortOrder,
+    sortMode,
+    skipCount,
+    sampleSize,
+    filteredBreed,
+  );
   try {
     const id = new Types.ObjectId(userId);
     const userRatings: UrlRatingData[] = await Dog.aggregate([
@@ -332,9 +343,29 @@ export async function aggregateDataForTable() {
     unwindUrlSubBreed,
     lookupUrlRatingDataFromZip,
     unwindUrlRatingData,
-    // then group breed and subBreed and average the ratings,
-    //project breed, subBreed[], avereageRating[], numberOfRates[]
+    projectSubBreedForGroup,
+    groupBySubBreed,
+    projectTidyUpGroupedSubBreeds,
   ]);
+  tableData.forEach((item) => {
+    if (item.breed === "affenpinscher") console.log(item);
+  });
+  return tableData;
+}
+
+export async function aggregateUserDataForTable(urlIdArray: string[]) {
+  const userTableData: TableData[] = await Dog.aggregate([
+    matchUserUrls(urlIdArray),
+    projectAndZipSubBreedUrlArrays,
+    unwindUrlSubBreed,
+    lookupUrlRatingDataFromZip,
+    unwindUrlRatingData,
+    projectSubBreedForGroup,
+    groupBySubBreed,
+    projectTidyUpGroupedSubBreeds,
+  ]);
+
+  return userTableData;
 }
 
 export async function aggreagateSingleUrl(url: string, userId: string) {

@@ -11,12 +11,35 @@ import {
   countAggregate,
   aggregateAllSorted,
   aggreagateSingleUrl,
+  aggregateDataForTable,
+  aggregateUserDataForTable,
   filteredCount,
   filteredCountUser,
 } from "../models/dog";
 import { saveUrlIdToUser, getUserUrls } from "../models/user";
 
 import { checkAccessToken, decodeToken } from "../middleware/auth";
+
+router.post(
+  "/",
+  [checkAccessToken],
+  async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    try {
+      const { url, rating, userId } = req.body;
+      const urlFromDB = await saveUrlWithUser(url, userId);
+      if (rating) await updateUrlRating(url, userId, rating);
+      const urlId = urlFromDB._id;
+      await saveUrlIdToUser(urlId, userId);
+      return res.status(200).send({ message: "success" });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 router.post(
   "/url",
@@ -90,7 +113,6 @@ router.post(
     next: express.NextFunction,
   ) => {
     try {
-      console.log("all-sorted one");
       let sortOrder: 1 | -1 = -1;
       if (req.body.sortOrder === "asc") sortOrder = 1;
       if (req.body.sortOrder === "desc") sortOrder = -1;
@@ -107,7 +129,6 @@ router.post(
         userId,
         filteredBreed,
       );
-      console.log("all-sorted two");
 
       return res.status(200).send(aggregateAll);
     } catch (error) {
@@ -131,6 +152,7 @@ router.post(
       const { sortMode, sampleSize, filteredBreed, userId, skipCount } =
         req.body;
       const userUrlArray = await getUserUrls(userId);
+
       const aggregateUser = await aggregateUserSorted(
         userUrlArray,
         userId,
@@ -140,6 +162,7 @@ router.post(
         sampleSize,
         filteredBreed,
       );
+      console.log("her");
       return res.status(200).send(aggregateUser);
     } catch (error) {
       next();
@@ -218,8 +241,24 @@ router.post(
   },
 );
 
-router.post(
-  "/",
+router.get(
+  "/table",
+  async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    try {
+      const tableData = await aggregateDataForTable();
+      return res.status(200).send(tableData);
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+router.get(
+  "/user/table",
   [checkAccessToken],
   async (
     req: express.Request,
@@ -227,12 +266,10 @@ router.post(
     next: express.NextFunction,
   ) => {
     try {
-      const { url, rating, userId } = req.body;
-      const urlFromDB = await saveUrlWithUser(url, userId);
-      if (rating) await updateUrlRating(url, userId, rating);
-      const urlId = urlFromDB._id;
-      await saveUrlIdToUser(urlId, userId);
-      return res.status(200).send({ message: "success" });
+      const { userId } = req.body;
+      const userUrlArray = await getUserUrls(userId);
+      const userTableData = await aggregateUserDataForTable(userUrlArray);
+      return res.status(200).send(userTableData);
     } catch (err) {
       next(err);
     }

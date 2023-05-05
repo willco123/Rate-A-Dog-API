@@ -74,9 +74,9 @@ type UsersRatingData = {
 
 export type TableData = {
   breed: string;
-  subBreed: (string | null)[];
-  averageRating: (number | null)[];
-  numberOfRates: number[];
+  subBreed: string | null;
+  averageRating: number | null;
+  numberOfRates: number;
 };
 
 export type UserUrlData = { urls: string[] };

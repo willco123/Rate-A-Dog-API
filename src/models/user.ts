@@ -120,7 +120,7 @@ export async function saveUrlIdToUser(urlId: Types.ObjectId, userId: string) {
       { new: true },
     );
     if (!user) return null;
-    console.log(user);
+
     return user;
   } catch (err: any) {
     throw err;

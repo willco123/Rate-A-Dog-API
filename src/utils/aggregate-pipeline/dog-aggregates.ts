@@ -196,6 +196,37 @@ export const projectUrlsForCount = {
   },
 };
 
+export const projectSubBreedForGroup = {
+  $project: {
+    breed: 1,
+    subBreed: { $arrayElemAt: ["$urlSubBreed", 0] },
+    urlRatingData: 1,
+  },
+};
+
+export const projectTidyUpGroupedSubBreeds = {
+  $project: {
+    _id: 0,
+    breed: "$_id.breed",
+    subBreed: "$_id.subBreed",
+    averageRating: 1,
+    numberOfRates: 1,
+  },
+};
+
+export const groupBySubBreed = {
+  $group: {
+    _id: {
+      breed: "$breed",
+      subBreed: "$subBreed",
+    },
+    averageRating: {
+      $avg: { $avg: "$urlRatingData.userRatingData.rating" },
+    },
+    numberOfRates: { $sum: "$urlRatingData.numberOfRates" },
+  },
+};
+
 export const unwindUrlSubBreed = { $unwind: "$urlSubBreed" };
 
 export const unwindUrlRatingData = {
