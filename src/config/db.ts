@@ -2,7 +2,7 @@ import mongoose, { ConnectOptions } from "mongoose";
 
 //Set up default mongoose connection
 const mongoDB =
-  process.env.NODE_ENV === "test"
+  process.env.NODE_ENV === "production"
     ? `mongodb+srv://${process.env.ATLAS_USER}:${process.env.ATLAS_PASSWORD}@willcocluster.imgveza.mongodb.net/?retryWrites=true&w=majority`
     : "mongodb://127.0.0.1/dogDB";
 mongoose
