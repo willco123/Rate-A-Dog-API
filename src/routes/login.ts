@@ -24,7 +24,8 @@ router.post(
         .cookie("refresh-token", refreshToken, {
           httpOnly: true,
           secure: true,
-          sameSite: "none",
+          sameSite: "lax",
+          domain: "https://rateadog.netlify.app",
         })
         .json({
           message: "You have logged in",
