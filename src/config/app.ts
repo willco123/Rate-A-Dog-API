@@ -8,11 +8,15 @@ import usersRouter from "../routes/users";
 import loginRouter from "../routes/login";
 import dogsRouter from "../routes/dogs";
 const app: Express = express();
+const isDev = process.env.NODE_ENV !== "production";
+const origin = isDev
+  ? "http://localhost:3000"
+  : "https://rateadog.onrender.com";
 
 app.use(logger("dev"));
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: origin,
     // exposedHeaders: "Set-Cookie",
     exposedHeaders: ["Authorization", "authorization"],
     credentials: true,
