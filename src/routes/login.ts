@@ -23,8 +23,8 @@ router.post(
         .setHeader("Authorization", accessToken)
         .cookie("refresh-token", refreshToken, {
           httpOnly: true,
-          secure: true, //--> SET TO TRUE ON PRODUCTION
-          sameSite: "strict",
+          secure: true,
+          sameSite: "lax",
         })
         .json({
           message: "You have logged in",
