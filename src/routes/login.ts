@@ -22,7 +22,7 @@ router.post(
         .status(200)
         .setHeader("Authorization", accessToken)
         .cookie("refresh-token", refreshToken, {
-          httpOnly: true,
+          // httpOnly: true,
           secure: true,
           sameSite: "lax",
           domain: "https://rateadog.netlify.app",
