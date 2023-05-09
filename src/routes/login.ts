@@ -25,7 +25,7 @@ router.post(
           httpOnly: true,
           secure: true,
           sameSite: "lax",
-          // domain: "rateadog.netlify.app",
+          domain: ".netlify.app",
         })
         .json({
           message: "You have logged in",
