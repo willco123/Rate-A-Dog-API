@@ -11,7 +11,7 @@ const app: Express = express();
 const isDev = process.env.NODE_ENV !== "production";
 const origin = isDev
   ? "http://localhost:3000"
-  : "https://rateadog.onrender.com";
+  : "https://keen-alpaca-82c877.netlify.app";
 
 app.use(logger("dev"));
 app.use(
