@@ -24,7 +24,7 @@ router.post(
         .cookie("refresh-token", refreshToken, {
           httpOnly: true,
           secure: true,
-          sameSite: "lax",
+          sameSite: "none",
         })
         .json({
           message: "You have logged in",
