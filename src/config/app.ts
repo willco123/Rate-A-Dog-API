@@ -14,7 +14,7 @@ const origin = isDev ? "http://localhost:3000" : "https://rateadog.netlify.app";
 app.use(logger("dev"));
 app.use(
   cors({
-    origin: "https://rateadog.netlify.app",
+    origin: origin,
     // exposedHeaders: "Set-Cookie",
     exposedHeaders: ["Authorization", "authorization"],
     credentials: true,
