@@ -7,6 +7,8 @@ import type { JwtTokenPayload } from "../utils/token-config";
 import { checkAccessToken } from "../middleware/auth";
 const router = express.Router();
 const secret = process.env.JWT_SECRET!;
+const isDev = process.env.NODE_ENV !== "production";
+const currentDomain = isDev ? "localhost" : "rateadog.netlify.app";
 
 router.post(
   "/login",
@@ -15,6 +17,7 @@ router.post(
     try {
       const refreshToken = req.refreshToken;
       const accessToken = req.accessToken;
+      console.log("currentDomain", currentDomain);
 
       if (refreshToken === undefined || accessToken === undefined)
         return res.status(500).send("Error in generating tokens");
@@ -24,8 +27,8 @@ router.post(
         .cookie("refresh-token", refreshToken, {
           httpOnly: true,
           secure: true,
-          sameSite: "none",
-          domain: "rateadog.netlify.app", //not setting a domain didn't even try to add cookie
+          sameSite: "lax",
+          // domain: currentDomain, //not setting a domain didn't even try to add cookie
         })
         .json({
           message: "You have logged in",
