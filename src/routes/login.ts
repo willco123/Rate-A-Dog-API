@@ -27,7 +27,7 @@ router.post(
         .cookie("refresh-token", refreshToken, {
           httpOnly: true,
           secure: true,
-          sameSite: "lax",
+          sameSite: "none",
           // domain: currentDomain, //not setting a domain didn't even try to add cookie
         })
         .json({
