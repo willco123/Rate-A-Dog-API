@@ -25,7 +25,7 @@ router.post(
           httpOnly: true,
           secure: true,
           sameSite: "none",
-          // domain: ".netlify.app",
+          domain: "netlify.app", //not setting a domain didn't even try to add cookie
         })
         .json({
           message: "You have logged in",
