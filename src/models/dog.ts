@@ -347,9 +347,6 @@ export async function aggregateDataForTable() {
     groupBySubBreed,
     projectTidyUpGroupedSubBreeds,
   ]);
-  tableData.forEach((item) => {
-    if (item.breed === "affenpinscher") console.log(item);
-  });
   return tableData;
 }
 

@@ -162,7 +162,6 @@ router.post(
         sampleSize,
         filteredBreed,
       );
-      console.log("her");
       return res.status(200).send(aggregateUser);
     } catch (error) {
       next();
