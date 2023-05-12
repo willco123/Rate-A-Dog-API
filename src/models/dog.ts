@@ -304,15 +304,6 @@ export async function aggregateUserSorted(
   sampleSize = 50,
   filteredBreed?: { breed: string; subBreed: string | null },
 ) {
-  console.log(
-    urlIdArray,
-    userId,
-    sortOrder,
-    sortMode,
-    skipCount,
-    sampleSize,
-    filteredBreed,
-  );
   try {
     const id = new Types.ObjectId(userId);
     const userRatings: UrlRatingData[] = await Dog.aggregate([
