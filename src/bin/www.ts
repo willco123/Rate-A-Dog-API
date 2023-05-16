@@ -2,15 +2,11 @@ import "dotenv/config";
 import app from "../app";
 import http from "http";
 import Debug from "debug";
-import { storeAllBreeds } from "../services/dog-api";
+
 const debug = Debug("backend:server");
 
 const port = process.env.PORT || 3005;
 app.set("port", port);
-
-// (async () => {
-//   await storeAllBreeds();
-// })();
 
 var server = http.createServer(app);
 server.listen(port);

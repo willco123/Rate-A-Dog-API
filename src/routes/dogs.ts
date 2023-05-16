@@ -17,8 +17,8 @@ import {
   filteredCountUser,
 } from "../models/dog";
 import { saveUrlIdToUser, getUserUrls } from "../models/user";
-
-import { checkAccessToken, decodeToken } from "../middleware/auth";
+import { storeAllBreeds } from "../services/dog-api";
+import { checkAccessToken, decodeToken, isAdmin } from "../middleware/auth";
 
 router.post(
   "/",
@@ -276,44 +276,15 @@ router.get(
 );
 
 router.post(
-  "/adminStuff",
-  [checkAccessToken],
+  "/admin/storeallbreeds",
+  [checkAccessToken, isAdmin],
   async (
     req: express.Request,
     res: express.Response,
     next: express.NextFunction,
   ) => {
     try {
-      //for adding single new documents
-      // const dog: Dog = req.body.dog;
-      // if (!req.body.userId) throw new Error();
-      // const userId: string = req.body.userId;
-      // const { breed, subBreed, url, rating } = dog;
-
-      // const urlFromDB = await saveUrlWithUser(url, userId);
-
-      // if (rating) await updateUrlRating(url, userId, rating);
-
-      // const urlId = urlFromDB._id;
-      // await saveUrlIdToUser(urlId, userId);
-
-      // let dogFromDB = await getDogByField({ breed: breed });
-      // if (!dogFromDB) dogFromDB = await saveDogToDB(breed);
-
-      // let { _id: dbId, subBreed: dbSubBreed } = dogFromDB;
-
-      // if (subBreed && !dbSubBreed.includes(subBreed)) {
-      //   dogFromDB = await saveSubBreedToDB(dbId, subBreed);
-      //   dbSubBreed = dogFromDB.subBreed;
-      // }
-
-      // let subBreedIndex = dbSubBreed.findIndex((element) => {
-      //   return element === subBreed;
-      // });
-
-      // if (subBreedIndex === -1) subBreedIndex = 0;
-
-      // await saveUrlIdToDog(urlId, dbId, subBreedIndex);
+      await storeAllBreeds();
 
       return res.status(200).send({ message: "success" });
     } catch (err) {

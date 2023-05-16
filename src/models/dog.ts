@@ -69,6 +69,26 @@ const DogSchema = new Schema({
 
 const Dog = mongoose.model("Dog", DogSchema);
 
+export async function deleteUserRating(
+  dogId: string | Types.ObjectId,
+  userId: string | Types.ObjectId,
+) {
+  try {
+    const aDog = Dog.findOneAndUpdate(
+      { _id: dogId },
+      {
+        $pull: { "urlData.userRatingData": { userId: userId } },
+        $inc: { "urlData.numberOfRates": -1 },
+      },
+      { new: true },
+    );
+    if (!aDog) throw new Error("Dog not found");
+    return aDog;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function saveDogToDB(breed: string) {
   try {
     const aDog = Dog.findOneAndUpdate(

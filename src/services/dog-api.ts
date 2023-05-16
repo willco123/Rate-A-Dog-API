@@ -52,11 +52,6 @@ export async function getDogByBreed(breed: string, subBreed?: string | null) {
   }
 }
 
-/*
-Hit dog-ceo, get all breeds, store them in the database
-Run once on server start-up
-Maybe make it so it runs when user logs in?
-*/
 export async function storeAllBreeds() {
   try {
     const response = await axios.get("https://dog.ceo/api/breeds/list/all");

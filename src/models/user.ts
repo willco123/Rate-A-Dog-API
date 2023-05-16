@@ -158,10 +158,13 @@ export async function getUserUrls(userId: string) {
     throw err;
   }
 }
-// export async function deleteUserByUsername(username: UsernameObj) {
-//   //admin only
-//   User.deleteOne(username);
-// }
+export async function deleteUser(userId: string | Types.ObjectId) {
+  try {
+    User.deleteOne({ _id: userId });
+  } catch (error) {
+    throw new Error("Error deleting user");
+  }
+}
 
 // export async function updateUser(
 //   username: UsernameObj,

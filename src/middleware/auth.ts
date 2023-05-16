@@ -118,5 +118,14 @@ export function decodeToken(token: string) {
   return decodedToken.userPayload;
 }
 
+export const isAdmin: RequestHandler = async (req, res, next) => {
+  const { userId } = req.body;
+  const user = await getUser({ _id: userId });
+  if (!user) return res.status(401).send("Unauthorized");
+  const rank = user.rank;
+  if (rank !== "admin") return res.status(401).send("Unauthorized");
+  next();
+};
+
 //maybe require both refresh and access tokens to be present to allow access, currently
 //only access token is required (although it is a short-lived token with no user info in payload)

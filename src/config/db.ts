@@ -1,10 +1,12 @@
 import mongoose, { ConnectOptions } from "mongoose";
 
 //Set up default mongoose connection
-const mongoDB =
+let mongoDB =
   process.env.NODE_ENV === "production"
     ? `mongodb+srv://${process.env.ATLAS_USER}:${process.env.ATLAS_PASSWORD}@willcocluster.imgveza.mongodb.net/?retryWrites=true&w=majority`
     : "mongodb://127.0.0.1/dogDB";
+
+if (process.env.NODE_ENV === "test") mongoDB = "mongodb://127.0.0.1/dogDBTest";
 mongoose
   .connect(mongoDB, {
     useNewUrlParser: true,
