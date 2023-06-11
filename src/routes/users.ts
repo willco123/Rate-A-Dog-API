@@ -42,7 +42,6 @@ router.post(
   ) => {
     try {
       const userId = req.body.userId;
-      // get userUrls
       const user = await getUser({ _id: userId });
       if (!user) throw new Error("User not found");
       const userUrlsIds = user.urls;
@@ -51,6 +50,7 @@ router.post(
       });
 
       await deleteUser(userId);
+      res.status(200).send("User deleted");
     } catch (err: any) {
       next(err);
     }

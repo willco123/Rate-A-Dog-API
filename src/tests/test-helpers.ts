@@ -1,4 +1,6 @@
 import express from "express";
+import { Types } from "mongoose";
+import type { UrlRating, Dogs } from "../types";
 
 export function setUpMockApp() {
   const app = express();
@@ -12,46 +14,72 @@ export function createMockUsers() {
       username: "mockUser1",
       password: "mockPass1",
       email: "mockEmail1@gmail.com",
+      rank: "user",
+      urls: [],
     },
 
     {
       username: "mockUser2",
       password: "mockPass2",
       email: "mockEmail2@gmail.com",
+      rank: "user",
+      urls: [],
     },
 
     {
       username: "mockUser3",
       password: "mockPass3",
       email: "mockEmail3@gmail.com",
+      rank: "user",
+      urls: [],
     },
   ];
   return mockUsers;
 }
 
-export function createMockDogs() {
-  let mockDogs = [
-    {
-      url: "url1",
-      breed: "breed1",
-      rating: 5,
-      numberOfRates: 1,
-    },
+export function createMockUrlRatings() {
+  const mockUrlRatings: Omit<UrlRating, "_id">[] = [];
 
-    {
-      url: "url2",
-      breed: "breed2",
-      rating: 7.5,
-      numberOfRates: 2,
-    },
+  for (let i = 0; i < 200; i++) {
+    mockUrlRatings.push({
+      url: `url${i}.jpg`,
+      numberOfRates: 0,
+      userRatingData: [],
+    });
+  }
+  return mockUrlRatings;
+}
 
-    {
-      url: "url3",
-      breed: "breed3",
-      rating: 2.5,
-      numberOfRates: 2,
-    },
-  ];
+export function createMockDogs(urlIds: Types.ObjectId[]) {
+  let mockDogs: Omit<Dogs, "_id">[] = [];
+  const noSubBreedUrlsIds = urlIds.slice(0, 50);
+  const singleSubBreedUrlsIds = urlIds.slice(50, 100);
+  const twoSubBreedUrlsIds = urlIds.slice(100, 200);
+
+  for (let i = 0; i < 10; i++) {
+    mockDogs.push({
+      breed: `breed${i}`,
+      subBreed: [],
+      urlData: [[...noSubBreedUrlsIds.slice(i * 5, (i + 1) * 5)]],
+    });
+  }
+  for (let i = 0; i < 10; i++) {
+    mockDogs.push({
+      breed: `breed${i}WithOneSubBreed`,
+      subBreed: ["subBreed2"],
+      urlData: [[...singleSubBreedUrlsIds.slice(i * 5, (i + 1) * 5)]],
+    });
+  }
+  for (let i = 0; i < 10; i++) {
+    mockDogs.push({
+      breed: `breed${i}WithTwoSubBreed`,
+      subBreed: ["subBreed1", "subBreed2"],
+      urlData: [
+        [...twoSubBreedUrlsIds.slice(i * 5, (i + 1) * 5)],
+        [...twoSubBreedUrlsIds.slice((i + 50) * 5, (i + 51) * 5)],
+      ],
+    });
+  }
   return mockDogs;
 }
 

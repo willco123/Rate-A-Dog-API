@@ -127,25 +127,6 @@ export async function saveUrlIdToUser(urlId: Types.ObjectId, userId: string) {
   }
 }
 
-export async function getUserUrlRatings(userId: string) {
-  try {
-    const id = new Types.ObjectId(userId);
-    const userUrls: UserUrlData[] = await User.aggregate([
-      matchUserId(id),
-      projectUrls,
-      lookupUrlRating,
-      unwindUrlData,
-      groupUrlWithRating(id),
-      projectUrlsAndRatings,
-    ]);
-    //assuming the above code gives a 1-1 mapping of urls to ratings then it should be fine
-    //assumption: group goes through each urlId and pushes rating and url at the same index
-    return userUrls[0];
-  } catch (err: any) {
-    throw err;
-  }
-}
-
 export async function getUserUrls(userId: string) {
   try {
     const id = new Types.ObjectId(userId);
@@ -153,6 +134,7 @@ export async function getUserUrls(userId: string) {
       { $match: { _id: id } },
       { $project: { _id: 0, urls: 1 } },
     ]);
+    if (userUrls.length === 0) return [];
     return userUrls[0].urls;
   } catch (err: any) {
     throw err;
@@ -165,6 +147,25 @@ export async function deleteUser(userId: string | Types.ObjectId) {
     throw new Error("Error deleting user");
   }
 }
+
+// export async function getUserUrlRatings(userId: string) {
+//   try {
+//     const id = new Types.ObjectId(userId);
+//     const userUrls: UserUrlData[] = await User.aggregate([
+//       matchUserId(id),
+//       projectUrls,
+//       lookupUrlRating,
+//       unwindUrlData,
+//       groupUrlWithRating(id),
+//       projectUrlsAndRatings,
+//     ]);
+//     //assuming the above code gives a 1-1 mapping of urls to ratings then it should be fine
+//     //assumption: group goes through each urlId and pushes rating and url at the same index
+//     return userUrls[0];
+//   } catch (err: any) {
+//     throw err;
+//   }
+// }
 
 // export async function updateUser(
 //   username: UsernameObj,

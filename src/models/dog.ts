@@ -74,7 +74,7 @@ export async function deleteUserRating(
   userId: string | Types.ObjectId,
 ) {
   try {
-    const aDog = Dog.findOneAndUpdate(
+    const aDog = await UrlRating.findOneAndUpdate(
       { _id: dogId },
       {
         $pull: { "urlData.userRatingData": { userId: userId } },
@@ -82,6 +82,7 @@ export async function deleteUserRating(
       },
       { new: true },
     );
+
     if (!aDog) throw new Error("Dog not found");
     return aDog;
   } catch (error) {
@@ -91,7 +92,7 @@ export async function deleteUserRating(
 
 export async function saveDogToDB(breed: string) {
   try {
-    const aDog = Dog.findOneAndUpdate(
+    const aDog = await Dog.findOneAndUpdate(
       { breed: breed },
       { breed: breed },
       { upsert: true, new: true },
@@ -147,7 +148,7 @@ export async function updateUrlRating(
     const isRatingNull = urlRatingObj.userRatingData[0].rating ? false : true;
     //for some reason i had to use this roundabout method to get $cond to actually return a number
     //using $eq to match the user rating threw a cast error aswell
-    await UrlRating.findOneAndUpdate(
+    const output = await UrlRating.findOneAndUpdate(
       { url: url, "userRatingData.userId": userId },
       {
         $inc: {
@@ -157,13 +158,13 @@ export async function updateUrlRating(
           "userRatingData.$.rating": rating,
         },
       },
-      { new: true },
+      { new: true, runValidators: true },
     );
 
-    return;
+    return output;
   } catch (err: any) {
-    if (err.code === 11000) return false;
-    throw err;
+    // if (err.code === 11000) return false;
+    throw new Error(err);
   }
 }
 
@@ -281,7 +282,7 @@ export async function aggregateRandomWithExclusions(
 
 export async function aggregateAllSorted(
   sortOrder: 1 | -1 = -1,
-  sortMode: "averageRating" | "numberOfRates" | "breed" = "averageRating",
+  sortMode: "averageRating" | "numberOfRates" | "breed" = "breed",
   skipCount: number = 0,
   sampleSize: number = 50,
   userId?: string,
@@ -392,22 +393,8 @@ export async function aggreagateSingleUrl(url: string, userId: string) {
 }
 
 export async function countAggregate() {
-  //get all user docs
   try {
     const totalCount = await UrlRating.countDocuments([{}]);
-
-    return totalCount;
-  } catch (error: any) {
-    throw new Error(error);
-  }
-}
-
-export async function countUserAggregate(urlIdArray: string[]) {
-  //get all user docs
-  try {
-    const totalCount = await UrlRating.countDocuments([
-      matchUserUrls(urlIdArray),
-    ]);
 
     return totalCount;
   } catch (error: any) {

@@ -7,7 +7,6 @@ import {
   aggregateUserSorted,
   aggregateRandomDocs,
   aggregateRandomWithExclusions,
-  countUserAggregate,
   countAggregate,
   aggregateAllSorted,
   aggreagateSingleUrl,
@@ -180,7 +179,7 @@ router.get(
     try {
       const userId = req.body.userId;
       const userUrlArray = await getUserUrls(userId);
-      const count = await countUserAggregate(userUrlArray);
+      const count = userUrlArray.length;
       return res.status(200).send({ count: count });
     } catch (error) {
       next();

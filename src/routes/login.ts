@@ -42,16 +42,19 @@ router.get("/logout", async (req, res, next) => {
   try {
     const refreshToken = req.cookies["refresh-token"];
     if (!refreshToken) return res.status(200).send("Already logged out");
-    const decondedToken = jwt.verify(refreshToken, secret) as JwtTokenPayload;
-    const userObjectId: string = decondedToken.userPayload as string;
+    const decodedToken = jwt.verify(refreshToken, secret) as JwtTokenPayload;
+    const userObjectId: string = decodedToken.userPayload as string;
     await deleteToken(userObjectId);
     res.removeHeader("Authorization");
     return res.status(200).clearCookie("refresh-token").json({
       message: "You have logged out",
     });
   } catch (err: any) {
-    if ((err.message = "invalid signature"))
-      return res.status(400).clearCookie("refresh-token").send("Bad Token");
+    if (err.message === "invalid signature")
+      return res
+        .status(400)
+        .clearCookie("refresh-token")
+        .send({ message: "Bad Token" });
     next(err);
   }
 });

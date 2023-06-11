@@ -5,7 +5,7 @@
   "main": "dist/bin/www.js",
   "scripts": {
     "start": "set DEBUG=* & nodemon",
-    "test": "Jest --runInBand --watchAll --verbose --coverage",
+    "test": "Jest  --watchAll --verbose --coverage",
     "build": "tsc -p tsconfig.build.json"
   },
   "author": "",
@@ -16,7 +16,7 @@
     "@types/cors": "^2.8.13",
     "@types/debug": "^4.1.7",
     "@types/express": "^4.17.14",
-    "@types/jest": "^29.0.2",
+    "@types/jest": "^29.5.1",
     "@types/lodash": "^4.14.185",
     "@types/morgan": "^1.9.3",
     "@types/node": "^18.7.18",
@@ -31,9 +31,9 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^15.2.5",
     "eslint-plugin-promise": "^6.0.1",
-    "jest": "^29.0.3",
+    "jest": "^29.5.0",
     "supertest": "^6.2.4",
-    "ts-jest": "^29.0.1",
+    "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1"
   },
   "dependencies": {

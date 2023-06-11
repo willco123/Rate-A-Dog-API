@@ -77,12 +77,12 @@ export const checkRefreshToken: RequestHandler = async (
 ) => {
   try {
     const refreshToken = req.cookies["refresh-token"];
-
     if (!refreshToken) {
       return res.status(401).send("Unauthorized, please log in");
     }
 
     const decodedToken = jwt.verify(refreshToken, secret) as JwtTokenPayload;
+
     const userObjectId: string = decodedToken.userPayload as string;
     const { expiration } = decodedToken;
 
@@ -90,8 +90,8 @@ export const checkRefreshToken: RequestHandler = async (
       await deleteToken(userObjectId);
       return res.status(401).send("Unauthorized, please log in");
     }
-
     const refreshTokenFromDB = await getToken(userObjectId);
+
     if (refreshTokenFromDB === null)
       return res.status(401).send("No user found, please register");
     if (refreshTokenFromDB === undefined)
@@ -124,6 +124,7 @@ export const isAdmin: RequestHandler = async (req, res, next) => {
   if (!user) return res.status(401).send("Unauthorized");
   const rank = user.rank;
   if (rank !== "admin") return res.status(401).send("Unauthorized");
+
   next();
 };
 

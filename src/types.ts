@@ -80,3 +80,10 @@ export type TableData = {
 };
 
 export type UserUrlData = { urls: string[] };
+
+export type Dogs = {
+  _id: Types.ObjectId;
+  breed: string;
+  subBreed: string[];
+  urlData: Array<Types.ObjectId[]>;
+};

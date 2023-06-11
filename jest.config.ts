@@ -4,6 +4,7 @@ const config: Config.InitialOptions = {
   preset: "ts-jest",
   testEnvironment: "node",
   verbose: true,
-  // testPathIgnorePatterns: [`<rootDir>/src/config/`],
+  modulePaths: ["<rootDir>"],
+  testPathIgnorePatterns: ["/db-test-config\\.ts"],
 };
 export default config;
