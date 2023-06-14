@@ -61,14 +61,14 @@ npm start
 
 1. POST /
 
-   Description: Saves a URL with associated user information.
-   Middleware: Requires an access token.
-   Request Body:
-   url (string): The URL to be saved.
-   rating (optional, number): The rating for the URL.
-   userId (string): The ID of the user associated with the URL.
-   Response:
-   Status 200: Successful operation. Returns a success message.
+Description: Saves a URL with associated user information.
+Middleware: Requires an access token.
+Request Body:
+url (string): The URL to be saved.
+rating (optional, number): The rating for the URL.
+userId (string): The ID of the user associated with the URL.
+Response:
+Status 200: Successful operation. Returns a success message.
 
 2. POST /url
 
