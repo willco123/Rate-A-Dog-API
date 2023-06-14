@@ -82,6 +82,7 @@ Setting a user to admin status is required manually through the database.
 2. POST /url
 
    Description: Retrieves aggregated data for a single URL.
+
    Middleware: Requires an access token.
    Request Body:
    url (string): The URL to retrieve data for.
