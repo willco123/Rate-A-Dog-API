@@ -56,6 +56,11 @@ Start the server
 npm start
 ```
 
+## Initialisation
+
+The project makes use of the dog-ceo API. The route POST /admin/storeallbreeds will scrape all the URLs from the dog-ceo API. This amount is relatively large (~200,000 image urls) and the route requires admin privileges to use.
+Setting a user to admin status is required manually through the database.
+
 ## Routes
 
 ### Dogs
@@ -281,8 +286,6 @@ Response:
 
     Status: 200 OK
     Body: "User deleted" (string)
-
-Setting a user to admin status is required manually through the database.
 
 ## License
 
