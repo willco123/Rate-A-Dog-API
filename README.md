@@ -67,17 +67,19 @@ Setting a user to admin status is required manually through the database.
 
 1. POST /
 
-   Description: Saves a URL with associated user information.
+Saves a URL with associated user information.
 
-   Middleware: Requires an access token.
+Middleware: Requires an access token.
 
-   Request Body:
-   url (string): The URL to be saved.
-   rating (optional, number): The rating for the URL.
-   userId (string): The ID of the user associated with the URL.
+Request Body:
 
-   Response:
-   Status 200: Successful operation. Returns a success message.
+    url (string): The URL to be saved.
+    rating (optional, number): The rating for the URL.
+    userId (string): The ID of the user associated with the URL.
+
+Response:
+
+    Status 200: Successful operation. Returns a success message.
 
 2. POST /url
 
