@@ -32,6 +32,7 @@ To customize and configure your application, you can set the following environme
     ATLAS_USER: Your MongoDB Atlas username.
     ATLAS_PASSWORD: Your MongoDB Atlas password.
     ATLAS_CLUSTER: Your MongoDB Atlas cluster name.
+    ATLAS_DB_NAME: Chosen mongoDB Atlas database name.
     JWT_SECRET: A secret key used for JSON Web Token (JWT) encryption and decryption.
     REFRESH_TOKEN_EXPIRATION_TIME: The expiration time for the refresh token, in ms.
     ACCESS_TOKEN_EXPIRATION_TIME: The expiration time for the access token, in ms.
