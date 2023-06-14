@@ -63,19 +63,20 @@ Setting a user to admin status is required manually through the database.
 
 ## Routes
 
+Some routes make use of middleware that typically request a valid JWT, the payload contains the userId which is then forwarded in the request body.
+
 ### Dogs
 
 1. POST /
 
-Saves a URL with associated user information.
+Allows a user to rate a URL.
 
 Middleware: Requires an access token.
 
 Request Body:
 
     url (string): The URL to be saved.
-    rating (optional, number): The rating for the URL.
-    userId (string): The ID of the user associated with the URL.
+    rating (number): The rating for the URL.
 
 Response:
 
@@ -83,114 +84,149 @@ Response:
 
 2. POST /url
 
-   Description: Retrieves aggregated data for a single URL.
+Retrieves aggregated data for a single URL.
 
-   Middleware: Requires an access token.
-   Request Body:
-   url (string): The URL to retrieve data for.
-   userId (string): The ID of the user associated with the URL.
-   Response:
-   Status 200: Successful operation. Returns aggregated data for the URL.
+Middleware: Requires an access token.
+Request Body:
+
+    url (string): The URL to retrieve data for.
+
+Response:
+
+    Status 200: Successful operation. Returns aggregated data for the URL.
 
 3. POST /all
 
-   Description: Retrieves randomly aggregated documents.
-   Request Body:
-   sampleSize (number): The number of documents to retrieve.
-   authHeader (optional, string): The authorization header containing the access token.
-   Response:
-   Status 200: Successful operation. Returns randomly aggregated documents.
+Retrieves randomly aggregated documents, default is 50.
+
+Request Body:
+
+    sampleSize (number): The number of documents to retrieve.
+    authHeader (optional, string): The authorization header containing the access token.
+
+Response:
+
+    Status 200: Successful operation. Returns randomly aggregated documents.
 
 4. POST /all/more
 
-   Description: Retrieves more randomly aggregated documents with exclusions.
-   Request Body:
-   sampleSize (number): The number of documents to retrieve.
-   authHeader (optional, string): The authorization header containing the access token.
-   currentlyLoadedDocuments (array): Array of documents already loaded.
-   Response:
-   Status 200: Successful operation. Returns more randomly aggregated documents.
+Retrieves more randomly aggregated documents with exclusions.
+
+Request Body:
+
+    sampleSize (number): The number of documents to retrieve.
+    authHeader (optional, string): The authorization header containing the access token.
+    currentlyLoadedDocuments (array): Array of documents already loaded.
+
+Response:
+
+    Status 200: Successful operation. Returns more randomly aggregated documents.
 
 5. POST /all/sorted
 
-   Description: Retrieves all documents sorted based on the provided parameters.
-   Request Body:
-   sortOrder (string): The sort order ("asc" or "desc").
-   sortMode (string): The sort mode.
-   sampleSize (number): The number of documents to retrieve.
-   filteredBreed (string): The breed to filter by.
-   skipCount (number): The number of documents to skip.
-   authHeader (optional, string): The authorization header containing the access token.
-   Response:
-   Status 200: Successful operation. Returns sorted aggregated documents.
+Retrieves all documents sorted based on the provided parameters.
+
+Request Body:
+
+    sortOrder (string): The sort order ("asc" or "desc").
+    sortMode (string): The sort mode ("breed", "averageRating", "numberOfRates").
+    sampleSize (number): The number of documents to retrieve.
+    skipCount (number): The number of documents to skip.
+    filteredBreed (optional): The breed to filter by ({ breed: string; subBreed: string | null }).
+    authHeader (optional, string): The authorization header containing the access token.
+
+Response:
+
+    Status 200: Successful operation. Returns sorted aggregated documents.
 
 6. POST /user
 
-   Description: Retrieves user-specific documents sorted based on the provided parameters.
-   Middleware: Requires an access token.
-   Request Body:
-   sortOrder (string): The sort order ("asc" or "desc").
-   sortMode (string): The sort mode.
-   sampleSize (number): The number of documents to retrieve.
-   filteredBreed (string): The breed to filter by.
-   userId (string): The ID of the user.
-   skipCount (number): The number of documents to skip.
-   Response:
-   Status 200: Successful operation. Returns user-specific sorted aggregated documents.
+Retrieves user-specific documents sorted based on the provided parameters.
+
+Middleware: Requires an access token.
+
+Request Body:
+
+    sortOrder (string): The sort order ("asc" or "desc").
+    sortMode (string): The sort mode ("breed", "averageRating", "numberOfRates").
+    sampleSize (number): The number of documents to retrieve.
+    skipCount (number): The number of documents to skip.
+    filteredBreed (optional): The breed to filter by ({ breed: string; subBreed: string | null }).
+
+Response:
+
+    Status 200: Successful operation. Returns user-specific sorted aggregated documents.
 
 7. GET /user/maxcount
 
-   Description: Retrieves the maximum count of user-specific documents.
-   Middleware: Requires an access token.
-   Request Body:
-   userId (string): The ID of the user.
-   Response:
-   Status 200: Successful operation. Returns the maximum count of user-specific documents.
+Retrieves the maximum count of user-specific documents.
+
+Middleware: Requires an access token.
+
+Response:
+
+    Status 200: Successful operation. Returns the maximum count of user-specific documents.
 
 8. GET /maxcount
 
-   Description: Retrieves the maximum count of all documents.
-   Response:
-   Status 200: Successful operation. Returns the maximum count of all documents.
+Retrieves the maximum count of all documents.
+
+Response:
+
+    Status 200: Successful operation. Returns the maximum count of all documents.
 
 9. POST /filtered/maxcount
 
-   Description: Retrieves the maximum count of documents filtered by breed.
-   Request Body:
-   filteredBreed (string): The breed to filter by.
-   Response:
-   Status 200: Successful operation. Returns the maximum count of filtered documents.
+Retrieves the maximum count of documents filtered by breed.
+
+Request Body:
+
+    filteredBreed ({breed: string; subBreed: string | null}): The breed to filter by.
+
+Response:
+
+    Status 200: Successful operation. Returns the maximum count of filtered documents.
 
 10. POST /user/filtered/maxcount
 
-    Description: Retrieves the maximum count of user-specific documents filtered by breed.
-    Middleware: Requires an access token.
-    Request Body:
-    filteredBreed (string): The breed to filter by.
-    userId (string): The ID of the user.
-    Response:
+Retrieves the maximum count of user-specific documents filtered by breed.
+
+Middleware: Requires an access token.
+
+Request Body:
+
+    filteredBreed ({breed: string; subBreed: string | null}): The breed to filter by.
+
+Response:
+
     Status 200: Successful operation. Returns the maximum count of filtered user-specific documents.
 
 11. GET /table
 
-    Description: Retrieves aggregated data for table display.
-    Response:
+Retrieves aggregated data for table display.
+
+Response:
+
     Status 200: Successful operation. Returns aggregated data for table display.
 
 12. GET /user/table
 
-    Description: Retrieves user-specific aggregated data for table display.
-    Middleware: Requires an access token.
-    Request Body:
-    userId (string): The ID of the user.
-    Response:
+Retrieves user-specific aggregated data for table display.
+
+Middleware: Requires an access token.
+
+Response:
+
     Status 200: Successful operation. Returns user-specific aggregated data for table display.
 
 13. POST /admin/storeallbreeds
 
-    Description: Stores all dog breeds in the database (admin-only).
-    Middleware: Requires an access token and admin privileges.
-    Response:
+Stores all dog breeds in the database (admin-only).
+
+Middleware: Requires an access token and admin privileges.
+
+Response:
+
     Status 200: Successful operation. Returns a success message.
 
 ### Login
