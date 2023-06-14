@@ -5,8 +5,7 @@
   "main": "dist/bin/www.js",
   "scripts": {
     "start": "set DEBUG=* & nodemon",
-    "test": "Jest  --watchAll --verbose --coverage",
-    "build": "tsc -p tsconfig.build.json"
+    "test": "Jest  --watchAll --verbose --coverage"
   },
   "author": "",
   "license": "ISC",
