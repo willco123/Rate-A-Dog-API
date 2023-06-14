@@ -87,6 +87,7 @@ Response:
 Retrieves aggregated data for a single URL.
 
 Middleware: Requires an access token.
+
 Request Body:
 
     url (string): The URL to retrieve data for.
